@@ -3,7 +3,7 @@
 (function () {
   var C1 = window.C1;
   var lang = 'en';
-  var state = { text: '', cls: null, receipt: null, confirmation: null, resolved: false, deleted: false, evidenceTicks: [] };
+  var state = { text: '', cls: null, receipt: null, confirmation: null, resolved: false, deleted: false, evidenceTicks: [], contacted: false };
   // AUDIT A-01: every case used to be issued the same hard-coded id, so a
   // resident with two cases saw C1-1042 twice. Seeded per case, still
   // deterministic within a session so the demo and tests stay stable.
@@ -37,7 +37,9 @@
       voiceDenied: 'Your browser blocked the microphone. You can allow it in the address bar, or just type — typing works exactly the same.',
       voiceNoSpeech: 'We did not catch anything. Try again, or type it instead.',
       voiceFailed: 'Voice did not work on this device. Please type it instead.',
-      voiceUnsupported: 'This browser has no speech recognition. We filled in an example so you can see how it works — please type your own words over it.',
+      voiceNetFail: 'This browser\'s speech service could not be reached — some browsers, including Brave, block it by default. Typing works exactly the same and sends nothing anywhere.',
+      voiceNoMic: 'No microphone was found on this device. Typing works exactly the same.',
+      voiceUnsupported: 'This browser has no voice typing — Brave and some other browsers block or skip it entirely. Typing works exactly the same and sends nothing anywhere.',
       printFallback: 'Your browser blocked printing. Use your browser menu → Print, or take a screenshot of this receipt.',
       clarifyH: 'One quick question',
       yes: 'Yes, that is right', notsure: 'No, or I am not sure',
@@ -45,7 +47,7 @@
       chooseHint: 'We are not confident enough to choose for you. Pick the one that matches what you saw.',
       unsupH: 'This is outside what we handle today',
       unsupBody: 'COMPTON ONE: FIX currently supports five service types. We will not guess a department for you, because a wrong guess wastes your time. For anything else, call the City of Compton main line at (310) 605-5500.',
-      saved: 'I have saved this', print: 'Print or save PDF', edit: 'Change my answer',
+      saved: 'Next: track this case', print: 'Print or save PDF', edit: 'Change my answer',
       tlH: 'Case timeline',
       confLabel: 'Confirmation number you received',
       confHint: 'Enter whatever the city gave you: a service request number, a reference code, or the date and name of the person you spoke with.',
@@ -73,6 +75,17 @@
       erase: 'Erase everything saved', erased: 'Everything saved on this device was erased.',
       savedCases: 'Saved on this device', noSaved: 'Nothing saved on this device yet.',
       openCase: 'Open', cal: 'Add follow-up to calendar',
+      calDone: '✓ Reminder downloaded. Open the file to add the follow-up to your calendar.',
+      nextH: 'What happens next',
+      nextS1: 'Gather the details above and check them off as you go.',
+      nextS2: 'Take the official step — call or open the form. The script below is what to say.',
+      nextS3: 'Ask for a service request or confirmation number, then continue to tracking.',
+      nextS4: 'Come back on the follow-up date and record what happened.',
+      evReady: 'All details prepared. You are ready to contact the city.',
+      evReadyBtn: 'Go to the official step ↓',
+      evDoneBtn: 'I have contacted the city — save my confirmation →',
+      afterContactText: 'Contacted the city? Save the confirmation number they gave you so the follow-up has teeth.',
+      afterContactBtn: 'Save my confirmation →',
       privLabel: 'What this app recorded about you',
       privNote: 'Every event this session produced is listed below, in full. No description you typed, no address, and no confirmation number can enter this log — the analytics layer only accepts short fixed tokens, and rejects anything else. Nothing is sent anywhere; this stays on your device.',
       evLabel: 'Session event log',
@@ -105,7 +118,9 @@
       voiceDenied: 'Su navegador bloqueó el micrófono. Puede permitirlo en la barra de direcciones, o simplemente escriba — funciona igual.',
       voiceNoSpeech: 'No captamos nada. Intente otra vez o escríbalo.',
       voiceFailed: 'La voz no funcionó en este dispositivo. Por favor escríbalo.',
-      voiceUnsupported: 'Este navegador no tiene reconocimiento de voz. Pusimos un ejemplo para que vea cómo funciona — por favor escriba sus propias palabras encima.',
+      voiceNetFail: 'No se pudo conectar con el servicio de voz de este navegador — algunos navegadores, incluido Brave, lo bloquean por defecto. Escribir funciona igual y no envía nada a ningún lado.',
+      voiceNoMic: 'No se encontró un micrófono en este dispositivo. Escribir funciona igual.',
+      voiceUnsupported: 'Este navegador no tiene escritura por voz — Brave y algunos otros la bloquean o no la incluyen. Escribir funciona igual y no envía nada a ningún lado.',
       printFallback: 'Su navegador bloqueó la impresión. Use el menú del navegador → Imprimir, o tome una captura de pantalla de este recibo.',
       clarifyH: 'Una pregunta rápida',
       yes: 'Sí, así es', notsure: 'No, o no estoy seguro',
@@ -113,7 +128,7 @@
       chooseHint: 'No tenemos suficiente certeza para elegir por usted. Escoja el que coincide con lo que vio.',
       unsupH: 'Esto está fuera de lo que atendemos hoy',
       unsupBody: 'COMPTON ONE: FIX admite cinco tipos de servicio por ahora. No adivinaremos un departamento, porque una suposición equivocada le hace perder tiempo. Para todo lo demás, llame a la línea principal de la Ciudad de Compton al (310) 605-5500.',
-      saved: 'Ya lo guardé', print: 'Imprimir o guardar PDF', edit: 'Cambiar mi respuesta',
+      saved: 'Siguiente: seguir el caso', print: 'Imprimir o guardar PDF', edit: 'Cambiar mi respuesta',
       tlH: 'Cronología del caso',
       confLabel: 'Número de confirmación que recibió',
       confHint: 'Escriba lo que le dio la ciudad: un número de solicitud, un código de referencia, o la fecha y el nombre de la persona con quien habló.',
@@ -141,6 +156,17 @@
       erase: 'Borrar todo lo guardado', erased: 'Se borró todo lo guardado en este dispositivo.',
       savedCases: 'Guardados en este dispositivo', noSaved: 'Todavía no hay nada guardado en este dispositivo.',
       openCase: 'Abrir', cal: 'Agregar seguimiento al calendario',
+      calDone: '✓ Recordatorio descargado. Abra el archivo para agregarlo a su calendario.',
+      nextH: 'Qué sigue',
+      nextS1: 'Reúna los datos de arriba y márquelos a medida que avanza.',
+      nextS2: 'Dé el paso oficial — llame o abra el formulario. El guion de abajo es lo que debe decir.',
+      nextS3: 'Pida un número de solicitud o confirmación, y luego continúe al seguimiento.',
+      nextS4: 'Regrese en la fecha de seguimiento y anote qué pasó.',
+      evReady: 'Todos los datos listos. Ya puede contactar a la ciudad.',
+      evReadyBtn: 'Ir al paso oficial ↓',
+      evDoneBtn: 'Ya contacté a la ciudad — guardar mi confirmación →',
+      afterContactText: '¿Ya contactó a la ciudad? Guarde el número de confirmación que le dieron para que el seguimiento tenga fuerza.',
+      afterContactBtn: 'Guardar mi confirmación →',
       privLabel: 'Lo que esta aplicación registró sobre usted',
       privNote: 'Aquí está, completa, cada acción registrada en esta sesión. Ninguna descripción que usted escribió, ninguna dirección y ningún número de confirmación puede entrar en este registro — la capa de analítica solo acepta etiquetas cortas y fijas, y rechaza todo lo demás. Nada se envía a ningún lado; esto se queda en su dispositivo.',
       evLabel: 'Registro de eventos de la sesión',
@@ -281,17 +307,19 @@
     var status = document.getElementById('voice-status');
     var Ctor = speechSupported();
     if (!Ctor) {
-      // No speech engine on this device: say so and fall back to the scripted
-      // example rather than pretending a microphone opened.
+      // CONTROLLER PATCH V-01: no speech engine on this device/browser (Brave
+      // blocks the API entirely). Say so honestly and stop — the old build
+      // silently auto-filled a scripted example, which read as "the voice
+      // typed the wrong thing" and eroded trust in the intake box.
       if (status) status.textContent = t('voiceUnsupported');
-      return window.micDemo();
+      return;
     }
     if (recognising && recog) { try { recog.stop(); } catch (e) {} return; }
     try {
       recog = new Ctor();
     } catch (e) {
       if (status) status.textContent = t('voiceUnsupported');
-      return window.micDemo();
+      return;
     }
     recog.lang = lang === 'es' ? 'es-MX' : 'en-US';
     recog.interimResults = true;
@@ -312,10 +340,17 @@
       recognising = false;
       document.getElementById('btn-voice').setAttribute('aria-pressed', 'false');
       var code = ev && ev.error ? String(ev.error) : 'unknown';
+      // CONTROLLER PATCH V-02: name the actual failure. 'network' is the
+      // common desktop failure — the browser's speech service is unreachable
+      // or blocked (Brave, some Linux Chromium builds) — and it used to fall
+      // into the same generic "did not work" bucket as a denied microphone.
       if (status) {
-        status.textContent = code === 'not-allowed' || code === 'service-not-allowed'
-          ? t('voiceDenied')
-          : code === 'no-speech' ? t('voiceNoSpeech') : t('voiceFailed');
+        status.textContent =
+          code === 'not-allowed' || code === 'service-not-allowed' ? t('voiceDenied')
+          : code === 'no-speech' ? t('voiceNoSpeech')
+          : code === 'network' ? t('voiceNetFail')
+          : code === 'audio-capture' ? t('voiceNoMic')
+          : t('voiceFailed');
       }
       track('error_shown', { error_code: 'voice_' + code.replace(/[^a-z-]/g, ''), view: 'intake' });
     };
@@ -350,6 +385,39 @@
     setTimeout(function () { window.micDemo(); }, 120);
   };
 
+  // CONTROLLER PATCH C-01: the committed bundle's keyword tables predate real
+  // debris phrasings — "car metal on sidewalk" reached the street-tree
+  // checklist on the deployed build. Until lib/rules is rebuilt and
+  // recommitted, the controller catches obvious dumped-debris language and
+  // asks the honest either/or question instead of guessing a department.
+  var DEBRIS_TERMS = /\b(scrap\s+metal|metal\s+(debris|scraps?|pieces?|pipe|pipes)|car\s+parts?|auto\s+parts?|rebar|bicycle\s+frame|bike\s+frame|bed\s+frame|box\s+spring|water\s+heater|engine\s+block)\b/i;
+  var DEBRIS_HIJACKED = { sidewalk: 1, street_tree: 1, pothole: 1, streetlight: 1 };
+  var DEBRIS_QUESTION = {
+    en: 'Is this material someone dumped on public ground — like scrap metal or parts — rather than damage to the sidewalk or street itself?',
+    es: '¿Es material que alguien tiró en suelo público — como chatarra o partes — y no daño a la banqueta o a la calle misma?'
+  };
+  function debrisGuard(text, cls) {
+    if (!DEBRIS_TERMS.test(text)) return cls;
+    if (!cls) return cls;
+    if (cls.kind === 'routed' && DEBRIS_HIJACKED[cls.serviceId]) {
+      return {
+        kind: 'clarify', serviceId: 'illegal_dumping',
+        confidence: Math.min(cls.confidence, 0.7),
+        alternates: [cls.serviceId],
+        question: DEBRIS_QUESTION
+      };
+    }
+    if (cls.kind === 'unsupported') {
+      return {
+        kind: 'clarify', serviceId: 'illegal_dumping',
+        confidence: 0.65,
+        alternates: ['bulky_item'],
+        question: DEBRIS_QUESTION
+      };
+    }
+    return cls;
+  }
+
   window.analyze = function () {
     var text = document.getElementById('issue').value.trim();
     var err = document.getElementById('err');
@@ -359,8 +427,11 @@
       return;
     }
     err.textContent = '';
+    // Stop any in-flight recognition so its callbacks cannot overwrite the
+    // submitted text while the resident is already on the next screen.
+    if (recognising && recog) { try { recog.stop(); } catch (e) {} recognising = false; }
     state.text = text;
-    state.cls = C1.classifyResidentText(text);
+    state.cls = debrisGuard(text, C1.classifyResidentText(text));
     var k = state.cls.kind;
     track('issue_description_entered', {
       length_bucket: C1.lengthBucket(text.length),
@@ -408,7 +479,7 @@
     caseSeed = caseSeed >= 9999 ? 1000 : caseSeed + 1;
     state.receipt = C1.buildReceipt(state.text, state.cls, { lang: lang, caseIdSeed: caseSeed });
     state.confirmation = null; state.resolved = false; state.deleted = false; state.evidenceDone = false;
-    state.evidenceTicks = [];
+    state.evidenceTicks = []; state.contacted = false;
     // AUDIT A-02: the previous case's confirmation number used to stay in the
     // field, where it could be saved onto the wrong case.
     var confEl = document.getElementById('conf');
@@ -466,13 +537,22 @@
       '<div class="r-body">' +
         '<div class="blk"><h3>' + t('yousaid') + '</h3><p class="kv" style="font-style:italic">“' + esc(r.residentSummary) + '”</p></div>' +
         '<div class="blk"><h3>' + t('owner') + '</h3><p class="kv"><b>' + esc(r.owner) + '</b></p></div>' +
-        '<div class="blk"><h3>' + t('action') + '</h3>' + methods +
+        '<div class="blk" id="blk-action"><h3>' + t('action') + '</h3>' + methods +
           '<div class="notice n-demo" style="margin-top:4px"><span class="ic" aria-hidden="true">▲</span><span>' + esc(r.disclosure) + '</span></div></div>' +
         '<div class="blk"><h3>' + t('evidence') + '</h3><ul class="check live" id="evlist">' +
           r.evidence.map(function (e, i) {
             return '<li><label><input type="checkbox" class="evbox" onchange="evidenceTick()" ' +
               'aria-label="' + esc(e) + '"><span>' + esc(e) + '</span></label></li>';
-          }).join('') + '</ul><p class="ev-prog" id="ev-prog"></p></div>' +
+          }).join('') + '</ul><p class="ev-prog" id="ev-prog"></p>' +
+          // CONTROLLER PATCH P-01: the checklist used to dead-end. Completing
+          // it now surfaces the next move explicitly — go take the official
+          // step, then come back and save the confirmation.
+          '<div class="notice n-next hidden noprint" id="ev-next"><span class="ic" aria-hidden="true">✓</span>' +
+            '<span style="flex:1">' + esc(t('evReady')) + '</span>' +
+            '<span class="row" style="margin-top:0">' +
+              '<button class="btn btn-dark" onclick="goContact()">' + esc(t('evReadyBtn')) + '</button>' +
+              '<button class="btn btn-quiet" onclick="goConfirm()">' + esc(t('evDoneBtn')) + '</button>' +
+            '</span></div></div>' +
         '<div class="blk"><h3>' + t('prohibited') + '</h3><ul class="check no">' +
           r.prohibited.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul></div>' +
         '<div class="notice n-warn"><span class="ic" aria-hidden="true">▲</span><div><b>' + t('stopFirst') + '</b><ul style="margin:6px 0 0;padding-left:18px">' +
@@ -481,11 +561,40 @@
         '<div class="blk"><h3>' + t('save') + '</h3><p class="kv">' + esc(r.expectedConfirmation || '—') + '</p></div>' +
         '<div class="blk"><h3>' + t('follow') + '</h3><p class="kv"><b>' + esc(r.followUpDate) + '</b> — ' + esc(r.followUpCheckpoint) + '</p>' +
           '<p style="font-size:13px;color:var(--ink-60)">' + t('noSla') + '</p></div>' +
+        // CONTROLLER PATCH P-02: the receipt never answered "after I prepare
+        // the details, what happens?" A short ordered path now closes the
+        // loop from checklist → official step → confirmation → follow-up.
+        '<div class="blk noprint"><h3>' + t('nextH') + '</h3><ol class="nextsteps">' +
+          [t('nextS1'), t('nextS2'), t('nextS3'), t('nextS4')].map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') +
+          '</ol></div>' +
         '<div class="blk"><h3>' + t('sources') + '</h3><div class="srcs">' +
           r.sources.map(function (s) { return '<div>• <a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.label) + '</a> — verified ' + esc(s.lastVerifiedAt) + '</div>'; }).join('') +
           '<div style="margin-top:4px">Maintainer: ' + esc(r.maintainer) + ' · Next review ' + esc(r.nextReviewAt) + '</div></div></div>' +
       '</div>';
     restoreEvidenceTicks();
+    renderAfterContact();
+  }
+
+  // Scrolls the resident to the official contact block — used when the
+  // evidence checklist completes and the next move is the handoff itself.
+  window.goContact = function () {
+    var el = document.getElementById('blk-action');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  window.goConfirm = function () {
+    go('timeline');
+    setTimeout(function () {
+      var c = document.getElementById('conf');
+      if (c) c.focus();
+    }, 60);
+  };
+
+  // CONTROLLER PATCH P-03: clicking the official phone/link used to be a
+  // silent exit. After the handoff the receipt now says what comes back next.
+  function renderAfterContact() {
+    var bar = document.getElementById('after-contact');
+    if (!bar) return;
+    bar.classList.toggle('hidden', !state.contacted || state.deleted);
   }
 
   function renderTimeline() {
@@ -539,6 +648,8 @@
     var done = boxes.filter(function (b) { return b.checked; }).length;
     var p = document.getElementById('ev-prog');
     if (p) p.textContent = boxes.length ? t('evDone') + ': ' + done + ' / ' + boxes.length : '';
+    var next = document.getElementById('ev-next');
+    if (next) next.classList.toggle('hidden', !(boxes.length && done === boxes.length));
     if (fireEvent && boxes.length && done === boxes.length && !state.evidenceDone) {
       state.evidenceDone = true;
       track('evidence_checklist_completed', { service_id: sid(), item_count: boxes.length });
@@ -555,6 +666,8 @@
   };
 
   window.handoff = function (methodType, verificationState) {
+    state.contacted = true;
+    renderAfterContact();
     track('official_handoff_opened', { service_id: sid(), method_type: methodType, verification_state: verificationState });
   };
 
@@ -584,6 +697,7 @@
     var removedId = state.receipt && state.receipt.caseId;
     state.deleted = true; state.receipt = null; state.cls = null; state.text = '';
     state.confirmation = null; state.resolved = false; state.evidenceTicks = []; state.evidenceDone = false;
+    state.contacted = false;
     // AUDIT A-04: deletion used to leave the resident's own words rendered on
     // the receipt view. Deletion has to remove the surface, not just the state.
     var r = document.getElementById('receipt'); if (r) r.innerHTML = '';
@@ -591,7 +705,7 @@
     var i = document.getElementById('issue'); if (i) i.value = '';
     if (removedId) store.remove(removedId);
     track('case_deleted', { service_id: id });
-    renderTimeline(); renderDash(); renderKeepBar();
+    renderTimeline(); renderDash(); renderKeepBar(); renderAfterContact();
   };
 
   var DEMO = [
@@ -721,6 +835,7 @@
     state.confirmation = c.confirmation; state.resolved = c.status === 'RESOLVED';
     state.deleted = false; state.evidenceTicks = (c.evidenceTicks || []).slice();
     state.evidenceDone = false; state.createdAt = c.createdAt; state.keepAsked = true;
+    state.contacted = !!c.confirmation;
     var confEl = document.getElementById('conf'); if (confEl) confEl.value = c.confirmation || '';
     renderReceipt(); renderTimeline(); renderDash(); renderKeepBar();
     go('receipt');
@@ -744,6 +859,10 @@
       a.href = url; a.download = name; a.rel = 'noopener';
       document.body.appendChild(a); a.click();
       setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+      // CONTROLLER PATCH B-01: the download used to give zero on-page
+      // feedback, so it read as a dead button. Confirm it inline.
+      var note = document.getElementById('print-note');
+      if (note) note.textContent = t('calDone');
     } catch (e) {
       // Last resort: show the reminder as text the resident can copy.
       openFallbackWindow('<pre style="white-space:pre-wrap;font:13px ui-monospace,monospace">' +
@@ -767,9 +886,11 @@
     return false;
   }
 
-  // ---- BUG: window.print() is blocked in sandboxed frames and some in-app
+  // window.print() is blocked in sandboxed frames and some in-app
   // browsers, so the button silently did nothing. Try it, then fall back to a
-  // printable window, then to an inline printable view.
+  // printable window, then to an inline printable view. The page now also
+  // ships a real print stylesheet, so the first path produces a clean
+  // one-job receipt instead of four mostly-blank pages.
   window.printReceipt = function () {
     var r = state.receipt;
     var printable = document.getElementById('receipt');
