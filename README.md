@@ -3,10 +3,24 @@
 **One problem. One path forward.**
 
 A bilingual (EN/ES) civic service navigation prototype for Compton, California.
-A resident describes a problem in plain language; the app matches it to a verified
-city service route, lists the evidence to gather, hands off to the official channel
-with a call script, issues a **Civic Action Receipt**, and tracks the case to a
-recorded outcome.
+A resident describes a city service problem in plain language; the app identifies
+the correct department from a catalog of **22 verified city service routes**, lists
+the evidence to gather, hands off to the official channel with a prepared call
+script, issues a **Civic Action Receipt**, and tracks the case to a recorded outcome.
+
+**22 routes catalogued.** Each carries a verified phone number or URL, the
+responsible department, and a `verificationState` (`officially_verified` or
+`needs_confirmation`) sourced directly from official City of Compton pages on
+2026-07-27. The catalog finding that justifies this product: **13 of 22 routes
+have no dedicated online intake form at all** — they are phone-only barriers for
+residents who work business hours or who are Deaf or hard of hearing.
+
+**5 routes actively routed.** Illegal dumping · pothole · streetlight outage ·
+missed trash pickup · water or sewer concern. For anything outside these five the
+app returns an honest "outside what we handle today" with the verified city main
+line — it never guesses a department. The remaining 17 routes are fully documented
+in [`docs/SERVICE-CATALOG.md`](docs/SERVICE-CATALOG.md) and represent the product
+roadmap.
 
 > **Scope:** This prototype prepares and tracks a resident's action. It does not
 > submit anything to the City of Compton. That limit is stated on the landing page,
@@ -58,12 +72,18 @@ docs/
 
 ---
 
-## The five core workflows
+## The 22 catalogued routes — 5 actively routed today
 
-Illegal dumping · pothole · streetlight outage · missed trash pickup · water or sewer concern.
+All 22 routes are sourced, verified, and documented in
+[`docs/SERVICE-CATALOG.md`](docs/SERVICE-CATALOG.md). The app actively routes
+five; the rest are the product roadmap.
 
-Anything else returns "outside what we handle today" and the verified city main line
-`(310) 605-5500`. The app never guesses a department.
+**Actively routed:** Illegal dumping · pothole · streetlight outage · missed trash pickup · water or sewer concern.
+
+**Catalogued, not yet routed:** Graffiti · abandoned vehicle · sidewalk · street tree · traffic signal / sign / marking · storm drain & flooding · bulky item pickup · recycling & e-waste · animal control · code / property violation · housing help · parking citation · utility billing · business licence / building permit · public records · power outage · homeless outreach.
+
+Anything outside the five active routes returns "outside what we handle today"
+plus the verified city main line `(310) 605-5500`. The app never guesses.
 
 ---
 
