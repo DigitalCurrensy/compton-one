@@ -7,7 +7,8 @@ interface (English, Español, Tagalog, 中文). A resident describes a city serv
 problem in plain language; the app identifies the correct department from a catalog
 of **22 verified city service routes**, lists the evidence to gather, hands off to
 the official channel with a prepared call script and ready-to-send message, issues
-a **Civic Action Receipt**, and tracks the case to a recorded outcome.
+a **Civic Action Receipt** with a **one-tap submission action** (wave 4), and
+tracks the case to a recorded outcome.
 
 **22 routes catalogued and routed.** Each carries a verified phone number or URL,
 the responsible department, and a `verificationState` (`officially_verified` or
@@ -81,6 +82,7 @@ app.template.html       Markup + design system (source for the HTML)
 app.js                  Controller part 1 — state, strings, routing (no build step)
 app.langs.js            Language pack — tl/zh chrome, catalog titles, bundle-boundary patches
 app.ui.js               Controller part 2 — receipt/timeline/dashboard/boot
+app.send.js             Wave 4 — verified submission channels + send block
 entry.ts                TypeScript entry point; exports C1 to window
 bundle.js               esbuild output of entry.ts + lib/ (committed, loaded as-is)
 verify.py               Browser checks (requires playwright)
@@ -148,6 +150,37 @@ Waves 1–2 (same day, earlier): R-01 scenario engine · V-01/V-02/V-03 voice
 honesty (superseded by W-01 removal) · C-01 debris guard · P-01/P-02/P-03
 pathway · M-01 Message Studio · C-02 Google Calendar · J-01 outcome-named
 journey · D-01/D-02 palette · B-01 dead-button feedback · print blank-page fix.
+
+---
+
+## Wave 4 — closing the loop: verified submission channels (2026-07-29)
+
+Every route now carries a **verified official submission channel**, researched
+from official sources only (comptoncity.org, republicservices.com,
+pticket.com/compton, sce.com — accessed 2026-07-29), and every receipt gains a
+**"Send your report"** block that uses it:
+
+- **7 official online forms** (comptoncity.org → I Want To → Report): illegal
+  dumping, graffiti, code violations, animal control, street-light outage
+  (city-owned), power outage, plus parking citations (pticket.com/compton).
+  The receipt deep-links the form and tells the resident to paste the Message
+  Studio text in.
+- **13 official published email addresses** (Public Works `contactpw@`,
+  Waste `contacttrash@`, Water `cwdcd@`, Housing `contactlh@`, City Clerk
+  `contactcc@`, Business License `contactbl@` — all @comptoncity.org). The
+  receipt's one-tap email draft now carries the verified To address and the
+  exact message the resident sees.
+- **1 honest phone-only route** (abandoned vehicles): no official written
+  channel could be verified, so the receipt says that instead of inventing one.
+- The official **City of Compton app** (comptoncity.org/services/compton-app)
+  is referenced as a secondary channel for street maintenance.
+
+Implementation: a self-contained module, `app.send.js` (5th script), that wraps
+`X.renderReceipt` and `window.emailDraft` from the outside — zero edits to
+`bundle.js`, `app.js`, `app.langs.js`, `app.ui.js`. The channel map is exposed
+as `C1X.SUBMISSION_CHANNELS`. Doctrine holds: **the app never sends anything
+itself** — the resident always presses send, and the block says so in all four
+languages. `verify.py` now runs 37 checks (32 wave-3 + 5 wave-4), all PASS.
 
 ---
 
