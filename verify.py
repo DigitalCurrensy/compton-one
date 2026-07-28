@@ -518,7 +518,7 @@ def c31():
     n0 = len(CONSOLE_ERRORS)
     APP.reload(); APP.page.wait_for_timeout(150)
     run_demo(); APP.page.wait_for_timeout(200)
-    case_id = APP.eval("document.querySelector('#receipt .r-case, #receipt [class*=case]') ? document.body.innerText.match(/C1-\d{4}/)[0] : ''")
+    case_id = APP.eval("document.querySelector('#receipt .r-case, #receipt [class*=case]') ? document.body.innerText.match(/C1-\\d{4}/)[0] : ''")
     btn = APP.page.query_selector("#keepbar button[onclick='keepAnswer(true)']")
     if not btn:
         return assert_true(False, "keep-yes button not found")
@@ -575,7 +575,7 @@ def c33():
     if not blk:
         probs.append("no #send-block injected")
     href = APP.eval("(document.querySelector('#send-block a')||{}).href || ''")
-    if "comptoncitycity.org/i-want-to/report/illegal-dumping" not in href:
+    if "comptoncity.org/i-want-to/report/illegal-dumping" not in href:
         probs.append(f"form href wrong: {href}")
     tgt = APP.eval("(document.querySelector('#send-block a')||{}).target || ''")
     if tgt != "_blank":
