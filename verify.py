@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""COMPTON ONE: FIX — wave-3 functional verification suite.
+"""COMPTON ONE: FIX — wave-3 + wave-4 functional verification suite.
 
 Self-contained: starts its own http.server on an ephemeral port, drives the
 app with Playwright (chromium headless), prints one line per check and exits
@@ -87,6 +87,11 @@ CHECK_NAMES = {
     30: "build: index.html == compton-one-fix.html",
     31: "persistence: keep -> reload -> dashboard -> openSaved",
     32: "ics: download click does not throw (en + tl)",
+    33: "wave4: form-type receipt shows official form link (dumping)",
+    34: "wave4: email-type receipt names verified address + mailto hook",
+    35: "wave4: phone-only service says so honestly (no fake channel)",
+    36: "wave4: send block translates (zh + tl headings)",
+    37: "wave4: channel map complete — 22 services, official domains only",
 }
 
 # ---------------------------------------------------------------------------
@@ -513,7 +518,7 @@ def c31():
     n0 = len(CONSOLE_ERRORS)
     APP.reload(); APP.page.wait_for_timeout(150)
     run_demo(); APP.page.wait_for_timeout(200)
-    case_id = APP.eval("document.querySelector('#receipt .r-case, #receipt [class*=case]') ? document.body.innerText.match(/C1-\\d{4}/)[0] : ''")
+    case_id = APP.eval("document.querySelector('#receipt .r-case, #receipt [class*=case]') ? document.body.innerText.match(/C1-\d{4}/)[0] : ''")
     btn = APP.page.query_selector("#keepbar button[onclick='keepAnswer(true)']")
     if not btn:
         return assert_true(False, "keep-yes button not found")
@@ -553,6 +558,112 @@ def c32():
     if errs:
         probs.append(f"{len(errs)} console errors: {errs[:2]}")
     return (not probs, ("; ".join(probs) if probs else dl_note.strip()))
+
+# ---------------------------------------------------------------------------
+# WAVE 4 — submission channels
+# ---------------------------------------------------------------------------
+def c33():
+    APP.reload()
+    analyze_text("someone dumped a couch and old tires on my corner")
+    APP.page.wait_for_timeout(200)
+    probs = []
+    if not view_visible("receipt"):
+        probs.append("no receipt for dumping input")
+    blk = inner_text("#send-block") if APP.page.query_selector("#send-block") else ""
+    if "Illegal dumping" not in inner_text("#receipt"):
+        probs.append("not the dumping receipt")
+    if not blk:
+        probs.append("no #send-block injected")
+    href = APP.eval("(document.querySelector('#send-block a')||{}).href || ''")
+    if "comptoncitycity.org/i-want-to/report/illegal-dumping" not in href:
+        probs.append(f"form href wrong: {href}")
+    tgt = APP.eval("(document.querySelector('#send-block a')||{}).target || ''")
+    if tgt != "_blank":
+        probs.append("form link does not open a new tab")
+    errs = APP.errors_since(0)
+    if errs:
+        probs.append(f"console errors: {errs[:1]}")
+    return (not probs, "; ".join(probs) if probs else "form channel rendered")
+
+def c34():
+    APP.reload()
+    analyze_text("There is a pot hole on my street")
+    APP.page.wait_for_timeout(200)
+    probs = []
+    blk = inner_text("#send-block") if APP.page.query_selector("#send-block") else ""
+    if "contactpw@comptoncity.org" not in blk:
+        probs.append("verified address not shown in block")
+    APP.eval("emailDraft()")
+    APP.page.wait_for_timeout(150)
+    href = APP.eval("window.__lastMailto || ''")
+    if not href.startswith("mailto:contactpw@comptoncity.org"):
+        probs.append(f"mailto To wrong: {href[:80]}")
+    if "Compton%20One" not in href and "Compton+One" not in href and "Compton One" not in href:
+        probs.append("subject missing from mailto")
+    if len(href) < 120:
+        probs.append("body suspiciously short — msgbox text not included")
+    return (not probs, "; ".join(probs) if probs else f"mailto ok ({len(href)} chars)")
+
+def c35():
+    APP.reload()
+    analyze_text("an abandoned car has been on my street for two weeks")
+    APP.page.wait_for_timeout(200)
+    probs = []
+    if not view_visible("receipt"):
+        probs.append("no receipt for abandoned vehicle")
+    blk = inner_text("#send-block") if APP.page.query_selector("#send-block") else ""
+    if not blk:
+        probs.append("no #send-block")
+    if APP.page.query_selector("#send-block a, #send-block button"):
+        probs.append("phone-only service must NOT show a form/email action")
+    if "phone" not in blk.lower():
+        probs.append("no honest phone-only note")
+    return (not probs, "; ".join(probs) if probs else "phone-only honesty ok")
+
+def c36():
+    APP.reload(); run_demo()
+    APP.eval("analyze()")
+    APP.page.wait_for_timeout(250)
+    probs = []
+    APP.eval("setLang('zh')")
+    APP.page.wait_for_timeout(250)
+    blk = APP.page.query_selector("#send-block")
+    if not blk:
+        probs.append("send block lost after zh switch")
+    else:
+        h3 = blk.query_selector("h3").inner_text()
+        if "发送" not in h3:
+            probs.append(f"zh heading not translated: {h3}")
+    APP.eval("setLang('tl')")
+    APP.page.wait_for_timeout(250)
+    blk = APP.page.query_selector("#send-block")
+    if not blk:
+        probs.append("send block lost after tl switch")
+    else:
+        h3 = blk.query_selector("h3").inner_text()
+        if "ipadala" not in h3.lower():  # h3 is CSS-uppercased
+            probs.append(f"tl heading not translated: {h3}")
+    APP.eval("setLang('en')")
+    return (not probs, "; ".join(probs) if probs else "zh + tl headings ok")
+
+def c37():
+    probs = []
+    n = APP.eval("Object.keys(C1X.SUBMISSION_CHANNELS).length")
+    if n != 22:
+        probs.append(f"channel map has {n} entries, expected 22")
+    bad = APP.eval("""Object.entries(C1X.SUBMISSION_CHANNELS).flatMap(([id,c]) => {
+      const out = [];
+      if (!['form','email','phone'].includes(c.type)) out.push(id + ':bad-type');
+      if (c.url && !/^https:\/\/([a-z0-9.-]+\.)?(comptoncity\.org|pticket\.com|sce\.com)\//.test(c.url)) out.push(id + ':url:' + c.url);
+      if (c.email && !/@comptoncity\.org$/.test(c.email)) out.push(id + ':email:' + c.email);
+      return out;
+    })""")
+    if bad:
+        probs.append(f"off-domain/unverified entries: {bad}")
+    ids = APP.eval("Object.keys(C1X.SUBMISSION_CHANNELS).filter(id => !C1.serviceCatalog[id])")
+    if ids:
+        probs.append(f"channels reference unknown services: {ids}")
+    return (not probs, "; ".join(probs) if probs else "22 services, official domains only")
 
 # ---------------------------------------------------------------------------
 # main
@@ -607,6 +718,10 @@ def main():
     # ICS / GCAL (receipt restored by c31)
     APP.phase = "ics"
     run(c32)
+
+    # WAVE 4 — submission channels
+    APP.phase = "wave4"
+    for f in (c33, c34, c35, c36, c37): run(f)
 
     APP.close()
     srv.shutdown()
