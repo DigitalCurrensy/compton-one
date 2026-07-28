@@ -91,11 +91,16 @@ textarea:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 3px #315cf
 /* notices */
 .notice{border-radius:14px;padding:15px 17px;font-size:14.5px;display:flex;gap:12px;align-items:flex-start;margin-top:16px}
 .notice .ic{font-family:var(--mono);font-weight:600;flex-shrink:0}
-.n-privacy{background:#31 5cff0d;background:#315cff0d;border:1px solid #315cff33}
+.n-privacy{background:#315cff0d;border:1px solid #315cff33}
 .n-warn{background:#ff6b350f;border:1px solid #ff6b3540}
 .n-demo{background:#10121008;border:1px dashed var(--concrete);color:var(--ink-60);font-size:13px}
 .n-emerg{background:var(--orange);color:#fff;border:0}
 .n-emerg a{color:#fff}
+.n-next{background:#2fcb7514;border:1px solid #2fcb7555;color:var(--ink);align-items:center;flex-wrap:wrap}
+
+/* pathway — what happens next */
+.nextsteps{margin:0;padding-left:22px;display:grid;gap:7px;font-size:15px}
+.nextsteps li::marker{font-family:var(--mono);font-size:12px;color:var(--ink-60)}
 
 /* receipt — signature element */
 .receipt{background:#fff;border:1px solid var(--line);border-radius:18px 18px 0 0;overflow:hidden;box-shadow:0 1px 0 #10121010,0 18px 40px -28px #10121055}
@@ -176,13 +181,25 @@ footer a{color:var(--concrete)}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:560px){ .tl li{grid-template-columns:78px 20px 1fr} .r-meta{gap:12px} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media print{header,footer,.noprint{display:none!important}body{background:#fff}.receipt{box-shadow:none;border:1px solid #999}}
+/*
+ * Print — one consolidated block. Two bugs fixed here:
+ * 1) break-inside:avoid on the WHOLE .receipt (taller than a page) made
+ *    Chrome emit mostly-blank pages. Only small blocks avoid breaks now.
+ * 2) the .tearwrap drop-shadow filter created a rendering context that
+ *    printed as blank. Filters are stripped for print.
+ */
 @media print{
-  header,footer,.row,.chips,#keepbar,#funnel,#evlog,.step,.skip,#v-landing,#v-dashboard{display:none !important}
+  header,footer,.row,.chips,#keepbar,#print-note,#funnel,#evlog,.step,.steps,.skip,.noprint,.tear,.eyebrow{display:none !important}
+  #v-landing,#v-intake,#v-clarify,#v-choose,#v-unsupported,#v-emergency,#v-timeline,#v-dashboard{display:none !important}
+  #v-receipt{display:block !important}
   body{background:#fff;color:#000}
+  main{padding:0}
   .wrap{max-width:none;padding:0}
-  .card,.receipt,.method{border-color:#999;box-shadow:none;break-inside:avoid}
+  .tearwrap{filter:none}
+  .receipt{box-shadow:none;border:1px solid #999;border-radius:0}
+  .blk,.method,.notice,.stat,.caseitem{break-inside:avoid}
   .r-head{background:#fff !important;color:#000 !important}
+  .r-meta,.r-meta b{color:#000 !important}
   a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;word-break:break-all}
   .notice{border:1px solid #999}
 }
@@ -306,6 +323,11 @@ footer a{color:var(--concrete)}
     <div id="keepbar" style="margin-top:20px"></div>
     <p class="hint" id="print-note" aria-live="polite" style="margin-top:10px"></p>
     <div class="tear"></div>
+  </div>
+  <div class="notice n-next hidden noprint" id="after-contact">
+    <span class="ic" aria-hidden="true">✓</span>
+    <span style="flex:1" data-t="afterContactText"></span>
+    <button class="btn btn-dark" onclick="goConfirm()" data-t="afterContactBtn"></button>
   </div>
   <div class="row noprint">
     <button class="btn btn-primary" onclick="go('timeline')"><span data-t="saved"></span> →</button>
