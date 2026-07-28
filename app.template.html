@@ -10,7 +10,7 @@
 <style>
 :root{
   --night:#101210; --paper:#F2EFE5; --signal:#D7FF45; --amber:#B06A00;
-  --green:#2FCB75; --concrete:#A8AAA3;
+  --green:#2FCB75; --concrete:#A8AAA3; --amber-ink:#8F5200;
   --ink:#101210; --ink-60:#10121099; --line:#10121022;
   --display:'Barlow Condensed',Arial Narrow,Haettenschweiler,sans-serif;
   --ui:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
@@ -24,6 +24,7 @@ h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.01em;line-h
 p{margin:0}
 button{font:inherit}
 :focus-visible{outline:3px solid var(--night);outline-offset:3px;border-radius:4px}
+header :focus-visible,.hero :focus-visible,footer :focus-visible,.n-emerg :focus-visible{outline-color:var(--signal)}
 .skip{position:absolute;left:-9999px;top:0;background:var(--night);color:var(--signal);padding:12px 18px;z-index:99;font-weight:600}
 .skip:focus{left:8px;top:8px}
 .wrap{max-width:940px;margin:0 auto;padding:0 var(--pad)}
@@ -41,7 +42,7 @@ header{background:var(--night);color:var(--paper);position:sticky;top:0;z-index:
 .steps{display:flex;gap:6px;padding:12px 0;flex-wrap:wrap}
 .step{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--concrete);display:flex;align-items:center;gap:6px}
 .step::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--line)}
-.step.on{color:var(--ink)} .step.on::before{background:var(--signal);box-shadow:0 0 0 3px #d7ff4540}
+.step.on{color:var(--paper)} .step.on::before{background:var(--signal);box-shadow:0 0 0 3px #d7ff4540}
 .step.done::before{background:var(--green)}
 
 /* hero */
@@ -82,9 +83,10 @@ main{padding:clamp(26px,4vw,44px) 0 80px}
 label.fld{display:block;font-weight:600;margin-bottom:8px}
 .hint{font-size:14px;color:var(--ink-60);margin-bottom:12px}
 textarea{width:100%;padding:16px;border:1.5px solid var(--line);border-radius:14px;font:inherit;background:var(--paper);color:var(--ink);resize:vertical;min-height:132px}
-textarea:focus{border-color:var(--night);outline:none;box-shadow:0 0 0 3px #10121022}
+textarea:focus{border-color:var(--night);box-shadow:0 0 0 3px #10121022}
+textarea:focus-visible{outline:3px solid var(--night);outline-offset:1px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
-.chip{background:transparent;border:1px dashed var(--concrete);color:var(--ink-60);border-radius:999px;padding:9px 14px;min-height:40px;font-size:13.5px;cursor:pointer;text-align:left}
+.chip{background:transparent;border:1px dashed var(--concrete);color:var(--ink-60);border-radius:999px;padding:10px 14px;min-height:44px;font-size:13.5px;cursor:pointer;text-align:left}
 .chip:hover{border-color:var(--night);color:var(--night);border-style:solid}
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px}
 
@@ -139,7 +141,11 @@ ul.check.live input{width:21px;height:21px;flex:none;margin:1px 0 0;accent-color
 .fnl{display:grid;gap:7px;margin:14px 0 18px}
 .fnl .r{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 .fnl .lab{flex:none;width:min(196px,44vw);color:var(--ink-60)}
-.fnl .bar{height:9px;background:var(--night);border-radius:5px;min-width:3px}
+.fnl .track{flex:1;display:block;height:9px;background:var(--line);border-radius:5px;overflow:hidden}
+.fnl .bar{display:block;height:9px;background:var(--night);border-radius:5px;max-width:100%}
+.rawlog{margin-top:14px}
+.rawlog summary{cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-60);padding:8px 0}
+.rawlog .evlog{margin-top:8px}
 .fnl .n{color:var(--ink-60)}
 .evlog{font-family:var(--mono);font-size:11.5px;display:grid;gap:5px;max-height:240px;overflow:auto}
 .evlog .row2{display:flex;gap:10px;padding:6px 9px;background:#fff;border:1px solid var(--line);border-radius:9px;flex-wrap:wrap}
@@ -151,7 +157,7 @@ ul.check.live input{width:21px;height:21px;flex:none;margin:1px 0 0;accent-color
 
 /* message studio */
 .msgtabs{display:flex;gap:8px;flex-wrap:wrap}
-.msgtab{background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 16px;min-height:40px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+.msgtab{background:transparent;border:1px solid var(--line);border-radius:999px;padding:10px 16px;min-height:44px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink)}
 .msgtab[aria-pressed="true"]{background:var(--night);color:var(--paper);border-color:var(--night)}
 .msgbox{border:1.5px dashed var(--concrete);border-radius:12px;padding:14px;font-size:14.5px;white-space:pre-wrap;background:var(--paper);margin-top:10px}
 
@@ -185,7 +191,21 @@ footer{background:var(--night);color:var(--concrete);padding:32px 0;font-size:13
 footer a{color:var(--concrete)}
 .hidden{display:none!important}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (max-width:560px){ .tl li{grid-template-columns:78px 20px 1fr} .r-meta{gap:12px} }
+@media (max-width:560px){
+  .tl li{grid-template-columns:78px 20px 1fr} .r-meta{gap:12px}
+  .grid5{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+  .hbar{gap:10px} .brand{font-size:18px}
+  .lang button{padding:9px 10px;font-size:12px;min-height:44px}
+  .cta-row .btn{width:100%;justify-content:center}
+  .row .btn{flex:1 1 auto;justify-content:center}
+  .method .big{font-size:16px}
+  .stats{grid-template-columns:repeat(2,1fr)} .stat .v{font-size:30px}
+  .msgtab{flex:1 1 auto;text-align:center}
+  .hero h1{font-size:clamp(40px,12.5vw,104px)}
+  .fnl .lab{width:38vw}
+}
+@media (max-width:380px){ .lang button{padding:9px 8px;font-size:11px} .brand{font-size:16px} }
+@media (max-width:560px){ .fnl .lab{font-size:10px} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /*
  * Print — one consolidated block. Two bugs fixed here:
@@ -212,14 +232,16 @@ footer a{color:var(--concrete)}
 </style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to main content</a>
+<a class="skip" href="#main" data-t="skipLink"></a>
 
 <header>
   <div class="wrap hbar">
     <div class="brand"><b>Compton One</b> <span>: Fix</span></div>
-    <div class="lang" role="group" aria-label="Language / Idioma">
+    <div class="lang" role="group" aria-label="Language / Idioma / Wika / 语言">
       <button id="lang-en" aria-pressed="true" onclick="setLang('en')">English</button>
       <button id="lang-es" aria-pressed="false" onclick="setLang('es')">Español</button>
+      <button id="lang-tl" aria-pressed="false" onclick="setLang('tl')">Tagalog</button>
+      <button id="lang-zh" aria-pressed="false" onclick="setLang('zh')">中文</button>
     </div>
   </div>
   <div class="wrap steps" id="steps" aria-hidden="true"></div>
@@ -269,12 +291,9 @@ footer a{color:var(--concrete)}
     <div class="notice n-privacy"><span class="ic" aria-hidden="true">🔒</span><span data-t="intakePriv"></span></div>
     <div class="row">
       <button class="btn btn-primary" onclick="analyze()"><span data-t="analyze"></span> →</button>
-      <button class="btn btn-quiet" id="btn-voice" aria-pressed="false" onclick="voiceInput()" data-t="voice"></button>
       <button class="btn btn-quiet" onclick="go('landing')" data-t="back"></button>
     </div>
-    <p class="hint" id="voice-status" aria-live="polite" style="margin-top:10px;font-weight:600;color:var(--night)"></p>
-    <p class="hint" style="margin-top:6px" data-t="voiceNote"></p>
-    <p id="err" role="alert" style="color:var(--amber);font-weight:600;margin-top:12px"></p>
+    <p id="err" role="alert" style="color:var(--amber-ink);font-weight:600;margin-top:12px"></p>
   </div>
 </section>
 
@@ -304,7 +323,7 @@ footer a{color:var(--concrete)}
 <section id="v-unsupported" class="wrap hidden">
   <div class="card">
     <h1 style="font-size:32px;text-transform:uppercase" data-t="unsupH"></h1>
-    <p class="hint" style="margin-top:10px" data-t="unsupBody"></p>
+    <p class="hint" style="margin-top:10px" id="unsup-body"></p>
     <div id="unsup-tiles" style="margin-top:18px"></div>
     <div class="row"><button class="btn btn-quiet" onclick="go('intake')" data-t="back"></button></div>
   </div>
@@ -317,6 +336,7 @@ footer a{color:var(--concrete)}
     <p style="margin-top:12px;font-size:17px" id="em-b"></p>
     <p style="margin-top:16px;font-family:var(--mono);font-size:19px;font-weight:600" id="em-911"></p>
     <p style="margin-top:6px;font-family:var(--mono);font-size:15px" id="em-sh"></p>
+    <p id="em-note" style="margin-top:14px;font-size:13px;color:var(--concrete)"></p>
   </div>
   <div class="row"><button class="btn btn-quiet" onclick="go('intake')" data-t="back"></button></div>
 </section>
@@ -355,6 +375,7 @@ footer a{color:var(--concrete)}
       <p class="hint" id="conf-hint"></p>
       <input id="conf" style="width:100%;padding:14px;border:1.5px solid var(--line);border-radius:12px;font:inherit;font-family:var(--mono);background:#fff" placeholder="e.g. SR-2026-04182">
       <p class="hint" style="margin-top:10px" data-t="confWhere"></p>
+      <p class="hint" id="conf-note" aria-live="polite" style="margin-top:12px;font-weight:600"></p>
       <div class="row">
         <button class="btn btn-dark" onclick="saveConf()" data-t="saveConf"></button>
         <button class="btn btn-quiet" onclick="markResolved()" data-t="resolve"></button>
@@ -383,7 +404,8 @@ footer a{color:var(--concrete)}
     <p class="hint" style="margin:0 0 4px" data-t="privNote"></p>
     <div class="fnl" id="funnel"></div>
     <p class="sec-label" style="margin-bottom:12px" data-t="evLabel"></p>
-    <div class="evlog" id="evlog" aria-live="polite"></div>
+    <div class="evlog" id="evlog"></div>
+    <details class="rawlog noprint"><summary data-t="rawLog"></summary><div class="evlog" id="rawevlog"></div></details>
   </div>
   <div class="row"><button class="btn btn-primary" onclick="startReport('dashboard')" data-t="newReport"></button></div>
 </section>
@@ -394,7 +416,7 @@ footer a{color:var(--concrete)}
   <div class="wrap">
     <p style="font-family:var(--display);font-size:19px;text-transform:uppercase;color:var(--paper)">Compton One : Fix</p>
     <p style="margin-top:8px" data-t="footer"></p>
-    <p style="margin-top:8px;font-family:var(--mono);font-size:11.5px">SOURCES LAST VERIFIED 2026-07-27 · NEXT REVIEW 2026-08-26 · <a href="https://www.comptoncity.org" target="_blank" rel="noopener">comptoncity.org</a></p>
+    <p style="margin-top:8px;font-family:var(--mono);font-size:11.5px"><span data-t="footerMeta"></span> · <a href="https://www.comptoncity.org" target="_blank" rel="noopener">comptoncity.org</a> · <a href="https://github.com/DigitalCurrensy/compton-one/issues/new" target="_blank" rel="noopener" data-t="reportWrongShort"></a></p>
   </div>
 </footer>
 
@@ -403,6 +425,9 @@ footer a{color:var(--concrete)}
 </script>
 <script>
 /*__APP__*/
+</script>
+<script>
+/*__APPLANGS__*/
 </script>
 <script>
 /*__APPUI__*/

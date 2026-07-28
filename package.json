@@ -4,8 +4,8 @@
   "private": true,
   "description": "Bilingual civic service navigation prototype — Compton, California",
   "scripts": {
-    "build": "npx esbuild entry.ts --bundle --format=iife --target=es2018 --outfile=bundle.js && python3 -c \"import pathlib; t=pathlib.Path('app.template.html').read_text(); pathlib.Path('compton-one-fix.html').write_text(t.replace('/*__BUNDLE__*/',pathlib.Path('bundle.js').read_text()).replace('/*__APP__*/',pathlib.Path('app.js').read_text()))\"",
-    "vercel-build": "rm -rf public && mkdir public && cp index.html compton-one-fix.html app.js app.ui.js bundle.js public/ && echo 'static site assembled into public/'",
+    "build": "npx esbuild entry.ts --bundle --format=iife --target=es2018 --outfile=bundle.js && python3 -c \"import pathlib; t=pathlib.Path('app.template.html').read_text(); pathlib.Path('compton-one-fix.html').write_text(t.replace('/*__BUNDLE__*/',pathlib.Path('bundle.js').read_text()).replace('/*__APP__*/',pathlib.Path('app.js').read_text()).replace('/*__APPLANGS__*/',pathlib.Path('app.langs.js').read_text()).replace('/*__APPUI__*/',pathlib.Path('app.ui.js').read_text()))\"",
+    "vercel-build": "rm -rf public && mkdir public && cp index.html compton-one-fix.html app.js app.langs.js app.ui.js bundle.js public/ && echo 'static site assembled into public/'",
     "test": "npx vitest run",
     "typecheck": "npx tsc --noEmit",
     "verify:browser": "python3 verify.py"
