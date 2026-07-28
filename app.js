@@ -32,24 +32,14 @@
       whatHint: 'Describe the problem the way you would explain it to a neighbor. Plain words work best.',
       examples: 'Or start from an example:',
       intakePriv: 'Do not include names, license plates, or accusations about a specific person. Describe what you saw.',
-      analyze: 'Find the right path', voice: '🎤 Speak instead of typing', back: '← Back',
-      voiceNote: 'Voice uses your browser\'s own speech recognition. On some browsers, including Chrome, that means the audio is sent to the browser maker to be turned into text — we never receive it and we never store it. Typing works exactly the same and sends nothing anywhere.',
-      voiceListening: '🎙 Listening… speak now, then pause.',
-      voiceHeard: '✓ Got it. Check the words below and fix anything that came out wrong.',
-      voiceDenied: 'Your browser blocked the microphone. You can allow it in the address bar, or just type — typing works exactly the same.',
-      voiceNoSpeech: 'We did not catch anything. Try again, or type it instead.',
-      voiceFailed: 'Voice did not work on this device. Please type it instead — typing works exactly the same and sends nothing anywhere.',
-      voiceBrave: 'Brave blocks the speech service that voice typing relies on, so voice cannot work in this browser. Voice does work in Chrome, Safari and Edge — or just type: typing works exactly the same and sends nothing anywhere.',
-      voiceNetFail: 'This browser\'s speech service could not be reached — some browsers block it by default. Typing works exactly the same and sends nothing anywhere.',
-      voiceNoMic: 'No microphone was found on this device. Typing works exactly the same.',
-      voiceUnsupported: 'This browser has no voice typing — some browsers block or skip it entirely. Typing works exactly the same and sends nothing anywhere.',
+      analyze: 'Find the right path', back: '← Back',
       printFallback: 'Your browser blocked printing. Use your browser menu → Print, or take a screenshot of this receipt.',
       clarifyH: 'One quick question',
       yes: 'Yes, that is right', notsure: 'No, or I am not sure',
       chooseH: 'This could be two different services',
       chooseHint: 'We are not confident enough to choose for you. Pick the one that matches what you saw.',
       unsupH: 'We could not match this one',
-      unsupBody: 'COMPTON ONE: FIX routes 22 city services, but we will not guess a department for you, because a wrong guess wastes your time. Try different words, pick the closest service below, or call the City of Compton main line at (310) 605-5500.',
+      unsupBody: 'COMPTON ONE: FIX routes {n} city services, but we will not guess a department for you, because a wrong guess wastes your time. Try different words, pick the closest service below, or call the City of Compton main line at (310) 605-5500.',
       saved: 'Next: track this case', print: 'Print or save PDF', edit: 'Change my answer',
       tlH: 'Case timeline',
       confLabel: 'Confirmation number you received',
@@ -100,6 +90,50 @@
       privNote: 'Every event this session produced is listed below, in full. No description you typed, no address, and no confirmation number can enter this log — the analytics layer only accepts short fixed tokens, and rejects anything else. Nothing is sent anywhere; this stays on your device.',
       evLabel: 'Session event log',
       evNone: 'No events recorded yet.',
+      stepNames: 'Describe|Match|Act|Track|Resolved',
+      how1t: 'Describe', how1d: 'Say what happened in your own words. No department names needed.',
+      how2t: 'Match', how2d: 'We match it to one of {n} verified city services and show you the source.',
+      how3t: 'Act', how3d: 'You get the evidence list, the official contact, and the exact words to say.',
+      how4t: 'Track', how4d: 'Save your confirmation number and get a follow-up date.',
+      demoText: 'Our trash was skipped and my mother cannot move the carts herself.',
+      clarifySure: 'we want to be sure before we send you anywhere.',
+      confSaved: '✓ Confirmation saved — your follow-up now has teeth.',
+      confEmpty: 'Enter the confirmation or reference number first — the field is empty.',
+      confSame: 'That confirmation is already saved.',
+      receiptLangNote: 'Receipts are written in English or Spanish — the languages the city works in. The buttons and menus stay in your language.',
+      emNote: 'Emergency details are shown in English. 9-1-1 works in English and Spanish.',
+      altH: 'Not quite right? One of these may fit better:',
+      reportIssue: 'Wrong number or dead link? Report it',
+      emailDraft: 'Open email draft',
+      emailHint: 'Opens your mail app with the message written. Paste the official address from the source links above — we never send anything ourselves.',
+      copyScript: 'Copy the script',
+      scriptCopied: '✓ Script copied — read it aloud when you call.',
+      lastVerified: 'LAST VERIFIED',
+      srcVerified: 'verified', srcMaintainer: 'Maintainer', srcNext: 'Next review',
+      msgReportTpl: 'Hello — I would like to report: {title}, near {loc}. It has been like this since {since}. Can you give me a service request number for this report? (Case {caseId})',
+      msgFollowTpl: 'Hello — I am following up on {title}, reported on {date}. My service request number is {conf}. What is the current status, and when can I expect action? (Case {caseId})',
+      msgEscalateTpl: 'Hello — I reported {title} on {date}, request number {conf}. My follow-up date {followUpDate} has passed with no update. Can this be escalated, and who is supervising the case? (Case {caseId})',
+      phLoc: '[nearest cross streets or approximate address]', phSince: '[date you first saw it]', phDate: '[date]', phConf: '[request number]',
+      dayToday: 'Today', dayBy: 'By ',
+      stHeard: 'HEARD', stClassified: 'CLASSIFIED', stReady: 'READY', stSubmitted: 'SUBMITTED', stFollowup: 'FOLLOW-UP DUE', stResolved: 'RESOLVED',
+      tlHeard: 'You described the issue in your own words.',
+      tlClassified: 'Matched to {title} ({pct}%).',
+      tlReady: 'Evidence list and official contact prepared.',
+      tlSubSaved: 'Confirmation saved: {conf}',
+      tlSubWait: 'Waiting for you to contact the city and save your confirmation.',
+      tlFollowDue: 'Check back if you have not heard anything.',
+      tlResolvedY: 'You marked this resolved.', tlResolvedN: 'Not yet.',
+      tlCaseDeleted: 'Case deleted', tlCaseDeletedBody: 'All details for this case were removed from this device.',
+      statCases: 'Cases', statResolved: 'Verified resolved', statDue: 'Follow-up due', statRate: 'Outcome rate',
+      gcalTitlePfx: 'Follow up: ',
+      fnl1: 'Intake started', fnl2: 'Issue described', fnl3: 'Route recommended', fnl4: 'Evidence prepared', fnl5: 'Official action opened', fnl6: 'Confirmation recorded', fnl7: 'Outcome verified',
+      evl_report_started: 'Report started', evl_language_selected: 'Language changed', evl_issue_description_entered: 'Issue described', evl_clarification_shown: 'One quick question shown', evl_route_recommended: 'Route recommended', evl_route_manually_selected: 'Service picked by hand', evl_evidence_checklist_completed: 'Evidence checklist finished', evl_official_handoff_opened: 'Official contact opened', evl_confirmation_saved: 'Confirmation saved', evl_follow_up_scheduled: 'Follow-up scheduled', evl_case_reopened: 'Case reopened', evl_case_marked_resolved: 'Marked resolved', evl_case_deleted: 'Case deleted', evl_error_shown: 'Something needed attention', evl_emergency_gate_shown: 'Emergency check shown', evl_message_copied: 'Message copied',
+      rawLog: 'Technical log (for auditors)',
+      docTitle: 'COMPTON ONE: FIX — One problem. One path forward.',
+      skipLink: 'Skip to main content',
+      footerMeta: 'SOURCES LAST VERIFIED 2026-07-27 · NEXT REVIEW 2026-08-26',
+      reportWrongShort: 'REPORT A WRONG NUMBER',
+      yourCaseMark: '(your case)',
     },
     es: {
       eyebrow: 'Navegación de servicios municipales · Compton, California',
@@ -121,24 +155,14 @@
       whatHint: 'Describa el problema como se lo explicaría a un vecino. Las palabras sencillas funcionan mejor.',
       examples: 'O empiece con un ejemplo:',
       intakePriv: 'No incluya nombres, placas de vehículos ni acusaciones contra una persona específica. Describa lo que vio.',
-      analyze: 'Encontrar el camino correcto', voice: '🎤 Hablar en vez de escribir', back: '← Atrás',
-      voiceNote: 'La voz usa el reconocimiento de voz de su propio navegador. En algunos navegadores, incluido Chrome, eso significa que el audio se envía al fabricante del navegador para convertirlo en texto — nosotros nunca lo recibimos ni lo guardamos. Escribir funciona igual y no envía nada a ningún lado.',
-      voiceListening: '🎙 Escuchando… hable ahora y luego haga una pausa.',
-      voiceHeard: '✓ Listo. Revise las palabras de abajo y corrija lo que salió mal.',
-      voiceDenied: 'Su navegador bloqueó el micrófono. Puede permitirlo en la barra de direcciones, o simplemente escriba — funciona igual.',
-      voiceNoSpeech: 'No captamos nada. Intente otra vez o escríbalo.',
-      voiceFailed: 'La voz no funcionó en este dispositivo. Por favor escríbalo — funciona igual y no envía nada a ningún lado.',
-      voiceBrave: 'Brave bloquea el servicio de voz que usa la escritura por voz, así que la voz no puede funcionar en este navegador. Sí funciona en Chrome, Safari y Edge — o simplemente escriba: funciona igual y no envía nada a ningún lado.',
-      voiceNetFail: 'No se pudo conectar con el servicio de voz de este navegador — algunos navegadores lo bloquean por defecto. Escribir funciona igual y no envía nada a ningún lado.',
-      voiceNoMic: 'No se encontró un micrófono en este dispositivo. Escribir funciona igual.',
-      voiceUnsupported: 'Este navegador no tiene escritura por voz — algunos navegadores la bloquean o no la incluyen. Escribir funciona igual y no envía nada a ningún lado.',
+      analyze: 'Encontrar el camino correcto', back: '← Atrás',
       printFallback: 'Su navegador bloqueó la impresión. Use el menú del navegador → Imprimir, o tome una captura de pantalla de este recibo.',
       clarifyH: 'Una pregunta rápida',
       yes: 'Sí, así es', notsure: 'No, o no estoy seguro',
       chooseH: 'Esto podría ser dos servicios distintos',
       chooseHint: 'No tenemos suficiente certeza para elegir por usted. Escoja el que coincide con lo que vio.',
       unsupH: 'No pudimos identificar este caso',
-      unsupBody: 'COMPTON ONE: FIX encamina 22 servicios municipales, pero no adivinaremos un departamento, porque una suposición equivocada le hace perder tiempo. Intente con otras palabras, escoja el servicio más cercano abajo, o llame a la línea principal de la Ciudad de Compton al (310) 605-5500.',
+      unsupBody: 'COMPTON ONE: FIX encamina {n} servicios municipales, pero no adivinaremos un departamento, porque una suposición equivocada le hace perder tiempo. Intente con otras palabras, escoja el servicio más cercano abajo, o llame a la línea principal de la Ciudad de Compton al (310) 605-5500.',
       saved: 'Siguiente: seguir el caso', print: 'Imprimir o guardar PDF', edit: 'Cambiar mi respuesta',
       tlH: 'Cronología del caso',
       confLabel: 'Número de confirmación que recibió',
@@ -189,13 +213,59 @@
       privNote: 'Aquí está, completa, cada acción registrada en esta sesión. Ninguna descripción que usted escribió, ninguna dirección y ningún número de confirmación puede entrar en este registro — la capa de analítica solo acepta etiquetas cortas y fijas, y rechaza todo lo demás. Nada se envía a ningún lado; esto se queda en su dispositivo.',
       evLabel: 'Registro de eventos de la sesión',
       evNone: 'Aún no hay eventos registrados.',
+      stepNames: 'Describir|Coincidir|Actuar|Seguir|Resuelto',
+      how1t: 'Describir', how1d: 'Diga qué pasó en sus propias palabras. No necesita nombres de departamentos.',
+      how2t: 'Coincidir', how2d: 'Lo asociamos con uno de {n} servicios verificados y le mostramos la fuente.',
+      how3t: 'Actuar', how3d: 'Recibe la lista de evidencia, el contacto oficial y las palabras exactas.',
+      how4t: 'Seguir', how4d: 'Guarde su número de confirmación y reciba una fecha de seguimiento.',
+      demoText: 'No recogieron nuestra basura y mi mamá no puede mover los botes sola.',
+      clarifySure: 'queremos estar seguros antes de enviarle a algún lado.',
+      confSaved: '✓ Confirmación guardada — su seguimiento ahora tiene fuerza.',
+      confEmpty: 'Escriba primero el número de confirmación o referencia — el campo está vacío.',
+      confSame: 'Esa confirmación ya está guardada.',
+      receiptLangNote: 'Los recibos se redactan en inglés o español — los idiomas en que trabaja la ciudad. Los botones y menús siguen en su idioma.',
+      emNote: 'Los detalles de emergencia se muestran en inglés. El 9-1-1 funciona en inglés y español.',
+      altH: '¿No es exactamente esto? Una de estas puede servir mejor:',
+      reportIssue: '¿Número equivocado o enlace roto? Repórtelo',
+      emailDraft: 'Abrir borrador de correo',
+      emailHint: 'Abre su aplicación de correo con el mensaje ya escrito. Pegue la dirección oficial de los enlaces de fuente de arriba — nosotros nunca enviamos nada.',
+      copyScript: 'Copiar el guion',
+      scriptCopied: '✓ Guion copiado — léalo en voz alta cuando llame.',
+      lastVerified: 'ÚLTIMA VERIFICACIÓN',
+      srcVerified: 'verificado', srcMaintainer: 'Mantenedor', srcNext: 'Próxima revisión',
+      msgReportTpl: 'Buenos días — quisiera reportar: {title}, cerca de {loc}. Está así desde {since}. ¿Me puede dar un número de solicitud para este reporte? (Caso {caseId})',
+      msgFollowTpl: 'Buenos días — doy seguimiento a {title}, reportado el {date}. Mi número de solicitud es {conf}. ¿Cuál es el estado actual y cuándo puedo esperar acción? (Caso {caseId})',
+      msgEscalateTpl: 'Buenos días — reporté {title} el {date}, número de solicitud {conf}. Mi fecha de seguimiento {followUpDate} ya pasó sin novedad. ¿Se puede escalar el caso y quién lo supervisa? (Caso {caseId})',
+      phLoc: '[calles transversales o dirección aproximada]', phSince: '[fecha en que lo vio por primera vez]', phDate: '[fecha]', phConf: '[número de solicitud]',
+      dayToday: 'Hoy', dayBy: 'Para ',
+      stHeard: 'ESCUCHADO', stClassified: 'CLASIFICADO', stReady: 'LISTO', stSubmitted: 'ENVIADO', stFollowup: 'SEGUIMIENTO PENDIENTE', stResolved: 'RESUELTO',
+      tlHeard: 'Usted describió el problema en sus propias palabras.',
+      tlClassified: 'Asociado con {title} ({pct}%).',
+      tlReady: 'Lista de evidencia y contacto oficial preparados.',
+      tlSubSaved: 'Confirmación guardada: {conf}',
+      tlSubWait: 'Esperando que contacte a la ciudad y guarde su confirmación.',
+      tlFollowDue: 'Verifique si no ha recibido respuesta.',
+      tlResolvedY: 'Usted marcó esto como resuelto.', tlResolvedN: 'Todavía no.',
+      tlCaseDeleted: 'Caso eliminado', tlCaseDeletedBody: 'Todos los detalles de este caso se eliminaron de este dispositivo.',
+      statCases: 'Casos', statResolved: 'Resueltos verificados', statDue: 'Seguimiento pendiente', statRate: 'Tasa de resultado',
+      gcalTitlePfx: 'Seguimiento: ',
+      fnl1: 'Reporte iniciado', fnl2: 'Problema descrito', fnl3: 'Ruta recomendada', fnl4: 'Evidencia preparada', fnl5: 'Contacto oficial abierto', fnl6: 'Confirmación registrada', fnl7: 'Resultado verificado',
+      evl_report_started: 'Reporte iniciado', evl_language_selected: 'Idioma cambiado', evl_issue_description_entered: 'Problema descrito', evl_clarification_shown: 'Pregunta rápida mostrada', evl_route_recommended: 'Ruta recomendada', evl_route_manually_selected: 'Servicio elegido a mano', evl_evidence_checklist_completed: 'Lista de evidencia completada', evl_official_handoff_opened: 'Contacto oficial abierto', evl_confirmation_saved: 'Confirmación guardada', evl_follow_up_scheduled: 'Seguimiento programado', evl_case_reopened: 'Caso reabierto', evl_case_marked_resolved: 'Marcado como resuelto', evl_case_deleted: 'Caso eliminado', evl_error_shown: 'Algo necesitó atención', evl_emergency_gate_shown: 'Aviso de emergencia mostrado', evl_message_copied: 'Mensaje copiado',
+      rawLog: 'Registro técnico (para auditores)',
+      docTitle: 'COMPTON ONE: FIX — Un problema. Un camino a seguir.',
+      skipLink: 'Saltar al contenido principal',
+      footerMeta: 'FUENTES VERIFICADAS 2026-07-27 · PRÓXIMA REVISIÓN 2026-08-26',
+      reportWrongShort: 'REPORTAR UN NÚMERO EQUIVOCADO',
+      yourCaseMark: '(su caso)',
     }
   };
   var A = C1.analytics;
   var store = C1.createCaseStore();
   function track(ev, props) { props = props || {}; props.lang = lang; A.track(ev, props); if (X.renderPrivacy) X.renderPrivacy(); }
   function sid() { return state.cls && state.cls.serviceId ? state.cls.serviceId : (state.receipt && state.receipt.serviceId) || 'none'; }
-  function t(k) { return T[lang][k] || k; }
+  // Hardened (review F2): if the language pack ever fails to load, tl/zh
+  // falls back to English instead of throwing mid-applyLang.
+  function t(k) { var d = T[lang] || T.en; return d[k] || T.en[k] || k; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
 
   var VIEWS = ['landing', 'intake', 'clarify', 'choose', 'unsupported', 'emergency', 'receipt', 'timeline', 'dashboard'];
@@ -216,9 +286,7 @@
     var el = document.getElementById('steps');
     if (!(current in STEPMAP)) { el.innerHTML = ''; return; }
     // J-01: steps name the outcome the resident gets, not the machinery.
-    var names = lang === 'en'
-      ? ['Describe', 'Match', 'Act', 'Track', 'Resolved']
-      : ['Describir', 'Coincidir', 'Actuar', 'Seguir', 'Resuelto'];
+    var names = t('stepNames').split('|');
     var i = STEPMAP[current];
     el.innerHTML = names.map(function (n, k) {
       return '<span class="step ' + (k < i ? 'done' : k === i ? 'on' : '') + '">' + esc(n) + '</span>';
@@ -227,9 +295,14 @@
 
   function applyLang() {
     document.documentElement.lang = lang;
+    document.title = t('docTitle');
     document.querySelectorAll('[data-t]').forEach(function (n) { n.textContent = t(n.getAttribute('data-t')); });
-    document.getElementById('lang-en').setAttribute('aria-pressed', String(lang === 'en'));
-    document.getElementById('lang-es').setAttribute('aria-pressed', String(lang === 'es'));
+    ['en', 'es', 'tl', 'zh'].forEach(function (l) {
+      var b = document.getElementById('lang-' + l);
+      if (b) b.setAttribute('aria-pressed', String(lang === l));
+    });
+    var ub = document.getElementById('unsup-body');
+    if (ub) ub.textContent = t('unsupBody').replace('{n}', String(C1.SERVICE_IDS.length));
     document.getElementById('conf-hint').textContent = t('confHint');
     renderTiles(); renderHow(); renderChips(); renderSteps();
     if (X.renderDash) X.renderDash();
@@ -257,13 +330,15 @@
   function tileHtml(id) {
     var r = C1.serviceCatalog[id];
     if (!r) return '';
-    return '<button class="tile" onclick="pick(\'' + id + '\')"><span class="t">' + esc(r.title[lang]) +
-      '</span><span class="s">' + esc(r.triggerExamples[lang][0]) + '</span></button>';
+    var title = r.title[lang] || r.title.en;
+    var example = (r.triggerExamples[lang] || r.triggerExamples.en)[0];
+    return '<button class="tile" onclick="pick(\'' + id + '\')"><span class="t">' + esc(title) +
+      '</span><span class="s">' + esc(example) + '</span></button>';
   }
 
   function renderTiles() {
     var grouped = TILE_GROUPS.map(function (g) {
-      return '<p class="tile-group">' + esc(g[lang]) + '</p><div class="grid5">' +
+      return '<p class="tile-group">' + esc(g[lang] || g.en) + '</p><div class="grid5">' +
         g.ids.map(tileHtml).join('') + '</div>';
     }).join('');
     // Anything added to the catalog but not to a group still has to appear.
@@ -280,27 +355,22 @@
   }
 
   function renderHow() {
-    var steps = lang === 'en'
-      ? [['Describe', 'Say what happened in your own words. No department names needed.'],
-         ['Match', 'We match it to one of 22 verified city services and show you the source.'],
-         ['Act', 'You get the evidence list, the official contact, and the exact words to say.'],
-         ['Track', 'Save your confirmation number and get a follow-up date.']]
-      : [['Describir', 'Diga qué pasó en sus propias palabras. No necesita nombres de departamentos.'],
-         ['Coincidir', 'Lo asociamos con uno de 22 servicios verificados y le mostramos la fuente.'],
-         ['Actuar', 'Recibe la lista de evidencia, el contacto oficial y las palabras exactas.'],
-         ['Seguir', 'Guarde su número de confirmación y reciba una fecha de seguimiento.']];
+    // R-03: the service count is derived from the live catalog, never
+    // hardcoded, so this copy cannot go stale when the catalog changes.
+    var n = String(C1.SERVICE_IDS.length);
+    var steps = [[t('how1t'), t('how1d')], [t('how2t'), t('how2d').replace('{n}', n)],
+                 [t('how3t'), t('how3d')], [t('how4t'), t('how4d')]];
     document.getElementById('how').innerHTML = steps.map(function (s, i) {
       return '<div><p class="n">0' + (i + 1) + '</p><h3>' + esc(s[0]) + '</h3><p>' + esc(s[1]) + '</p></div>';
     }).join('');
   }
 
   function renderChips() {
-    var ex = [
-      C1.serviceCatalog.missed_trash.triggerExamples[lang][0],
-      C1.serviceCatalog.streetlight.triggerExamples[lang][0],
-      C1.serviceCatalog.illegal_dumping.triggerExamples[lang][0],
-      C1.serviceCatalog.pothole.triggerExamples[lang][0]
-    ];
+    var trig = function (id) {
+      var r = C1.serviceCatalog[id];
+      return (r.triggerExamples[lang] || r.triggerExamples.en)[0];
+    };
+    var ex = [trig('missed_trash'), trig('streetlight'), trig('illegal_dumping'), trig('pothole')];
     document.getElementById('chips').innerHTML = ex.map(function (e) {
       return '<button class="chip" onclick="useExample(this)">' + esc(e) + '</button>';
     }).join('');
@@ -311,108 +381,24 @@
     track('route_manually_selected', { service_id: id, origin: current === 'landing' ? 'tile' : 'ambiguous_choice' });
     var r = C1.serviceCatalog[id];
     state.text = document.getElementById('issue') && document.getElementById('issue').value
-      ? document.getElementById('issue').value : r.triggerExamples[lang][0];
+      ? document.getElementById('issue').value : (r.triggerExamples[lang] || r.triggerExamples.en)[0];
     state.cls = { kind: 'routed', serviceId: id, confidence: 1, alternates: [] };
     buildAndShow();
   };
 
-  var recog = null, recognising = false, braveFlag = false;
-  function speechSupported() {
-    return typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
-  }
-
-  // CONTROLLER PATCH V-03: Brave ships the SpeechRecognition API surface but
-  // blocks the speech service itself, so the old flow prompted for the mic and
-  // then failed with a generic error — it read as broken. Detect Brave up
-  // front and say the honest thing before any permission prompt. Handles both
-  // the Promise and sync-boolean forms of navigator.brave.isBrave().
-  function braveDetected(cb) {
-    try {
-      if (navigator.brave && typeof navigator.brave.isBrave === 'function') {
-        var r = navigator.brave.isBrave();
-        if (r && typeof r.then === 'function') { r.then(function (v) { cb(!!v); }, function () { cb(false); }); return; }
-        cb(!!r); return;
-      }
-    } catch (e) { /* fall through */ }
-    cb(false);
-  }
-
-  window.voiceInput = function () {
-    var el = document.getElementById('issue');
-    var status = document.getElementById('voice-status');
-    var Ctor = speechSupported();
-    if (!Ctor) {
-      if (status) status.textContent = t('voiceUnsupported');
-      return;
-    }
-    if (recognising && recog) { try { recog.stop(); } catch (e) {} return; }
-    braveDetected(function (isBrave) {
-      braveFlag = isBrave;
-      if (isBrave) { if (status) status.textContent = t('voiceBrave'); return; }
-      startRecognition(el, status, Ctor);
-    });
-  };
-
-  function startRecognition(el, status, Ctor) {
-    try {
-      recog = new Ctor();
-    } catch (e) {
-      if (status) status.textContent = t('voiceUnsupported');
-      return;
-    }
-    recog.lang = lang === 'es' ? 'es-MX' : 'en-US';
-    recog.interimResults = true;
-    recog.continuous = false;
-    recog.maxAlternatives = 1;
-    var base = el.value ? el.value.trim() + ' ' : '';
-    recognising = true;
-    document.getElementById('btn-voice').setAttribute('aria-pressed', 'true');
-    if (status) status.textContent = t('voiceListening');
-
-    recog.onresult = function (ev) {
-      var text = '';
-      for (var i = ev.resultIndex; i < ev.results.length; i++) text += ev.results[i][0].transcript;
-      el.value = base + text;
-      if (status) status.textContent = t('voiceHeard');
-    };
-    recog.onerror = function (ev) {
-      recognising = false;
-      document.getElementById('btn-voice').setAttribute('aria-pressed', 'false');
-      var code = ev && ev.error ? String(ev.error) : 'unknown';
-      // V-02: name the actual failure. 'network'/'unknown' on Chromium usually
-      // means the speech service is unreachable or blocked — not the mic.
-      if (status) {
-        status.textContent =
-          code === 'not-allowed' || code === 'service-not-allowed' ? t('voiceDenied')
-          : code === 'no-speech' ? t('voiceNoSpeech')
-          : code === 'audio-capture' ? t('voiceNoMic')
-          : (code === 'network' || code === 'unknown' || code === 'aborted' || code === 'language-not-supported')
-            ? (braveFlag ? t('voiceBrave') : t('voiceNetFail'))
-          : t('voiceFailed');
-      }
-      track('error_shown', { error_code: 'voice_' + code.replace(/[^a-z-]/g, ''), view: 'intake' });
-    };
-    recog.onend = function () {
-      recognising = false;
-      var b = document.getElementById('btn-voice');
-      if (b) b.setAttribute('aria-pressed', 'false');
-      if (status && status.textContent === t('voiceListening')) status.textContent = t('voiceNoSpeech');
-      el.focus();
-    };
-    state.inputMode = 'voice';
-    try { recog.start(); } catch (e) {
-      recognising = false;
-      if (status) status.textContent = t('voiceFailed');
-    }
-  }
-
+  // VOICE REMOVED (W-01, 2026-07-28): voice input depended on the browser
+  // vendor's speech service — hard-blocked on Brave, quietly proxied through
+  // Google on Chrome, and a gimmick for the residents who most needed a
+  // reliable path. One honest input method now: typing. micDemo stays because
+  // the landing-page demo fills the textarea with a sample report.
   window.micDemo = function () {
-    state.inputMode = 'voice_sim';
+    state.inputMode = 'demo';
     var el = document.getElementById('issue');
-    var demo = lang === 'en'
-      ? 'Our trash was skipped and my mother cannot move the carts herself.'
-      : 'No recogieron nuestra basura y mi mamá no puede mover los botes sola.';
-    el.value = demo; el.focus();
+    // Intake matching runs in en/es only (the whatHint note says so in tl/zh),
+    // so the demo feeds the engine a routable sentence — English, or Spanish
+    // when the UI is Spanish — regardless of the chrome language.
+    el.value = lang === 'es' ? T.es.demoText : T.en.demoText;
+    el.focus();
   };
 
   window.startReport = function (entry) { track('report_started', { entry: entry }); go('intake'); };
@@ -559,14 +545,56 @@
     return t.indexOf(' ' + phrase + ' ') !== -1;
   }
 
+  // CONTROLLER PATCH R-02: typo and phrasing tolerance. The tested engine
+  // matches exact tokens, so "pot hole", "grafitti" or "lost my dog" used to
+  // fall through to the unsupported wall although the intent was obvious.
+  // A small curated rewrite table plus an order-free word-set scorer —
+  // deterministic, inspectable, no guessing. Additions go here, never in
+  // the bundle.
+  var TEXT_FIXES = [
+    [/\bpot\s*holes?\b/gi, 'pothole'],
+    [/\bgrafitt?i\b/gi, 'graffiti'], [/\bgrafity\b/gi, 'graffiti'],
+    [/\btrafic\b/gi, 'traffic'], [/\btraffick\b/gi, 'traffic'],
+    [/\bst\s+lights?\b/gi, 'streetlight'], [/\bstreet\s+lites?\b/gi, 'streetlight'],
+    [/\bstreet\s+ligths?\b/gi, 'streetlight'], [/\blightpost\b/gi, 'lamp post'],
+    [/\brecylce\b/gi, 'recycle'], [/\brecyclingg\b/gi, 'recycling'],
+    [/\bmattres\b/gi, 'mattress'], [/\bcouchs\b/gi, 'couch'],
+    [/\btyres\b/gi, 'tires'],
+    [/\bside\s*walk\b/gi, 'sidewalk'], [/\bsidwalk\b/gi, 'sidewalk'],
+    [/\bwater\s+leake?\b/gi, 'water leak'],
+    [/\bstop\s+sing\b/gi, 'stop sign'],
+    [/\bcross\s*walk\b/gi, 'crosswalk'],
+    [/\blost\s+my\s+dog\b/gi, 'lost dog'], [/\blost\s+my\s+cat\b/gi, 'lost cat'],
+    [/\blost\s+my\s+pet\b/gi, 'lost pet'],
+    [/\bfound\s+a\s+dog\b/gi, 'found dog'], [/\bfound\s+a\s+cat\b/gi, 'found cat'],
+    [/\bfound\s+a\s+pet\b/gi, 'found pet'],
+    [/\bno\s+recojieron\b/gi, 'no recogieron']
+  ];
+  function fixText(s) {
+    var out = ' ' + s + ' ';
+    for (var i = 0; i < TEXT_FIXES.length; i++) out = out.replace(TEXT_FIXES[i][0], ' ' + TEXT_FIXES[i][1] + ' ');
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  function looseHit(text, phrase) {
+    // Order-free word-set match for interpolated phrasing ("i lost my dog"
+    // for the phrase "lost dog"). Only for multiword phrases, and only in
+    // secondPass scoring, so exact phrase hits always outrank it.
+    var words = phrase.split(' ');
+    if (words.length < 2) return false;
+    var norm = ' ' + text.toLowerCase().replace(/[^a-z0-9ñ\s]/g, ' ').replace(/\s+/g, ' ') + ' ';
+    for (var i = 0; i < words.length; i++) if (norm.indexOf(' ' + words[i] + ' ') === -1) return false;
+    return true;
+  }
+
   function secondPass(text) {
     var best = null, runner = null;
     for (var i = 0; i < SCENARIO_RULES.length; i++) {
       var rule = SCENARIO_RULES[i];
       if (!C1.serviceCatalog[rule.id]) continue;
       var s = 0, j;
-      for (j = 0; j < rule.strong.length; j++) if (scenarioHit(text, rule.strong[j])) s += 3;
-      for (j = 0; j < rule.medium.length; j++) if (scenarioHit(text, rule.medium[j])) s += 2;
+      for (j = 0; j < rule.strong.length; j++) { if (scenarioHit(text, rule.strong[j])) s += 3; else if (looseHit(text, rule.strong[j])) s += 1; }
+      for (j = 0; j < rule.medium.length; j++) { if (scenarioHit(text, rule.medium[j])) s += 2; else if (looseHit(text, rule.medium[j])) s += 1; }
       for (j = 0; j < rule.weak.length; j++) if (scenarioHit(text, rule.weak[j])) s += 1;
       if (s <= 0) continue;
       if (!best || s > best.score) { runner = best; best = { id: rule.id, score: s }; }
@@ -574,8 +602,11 @@
     }
     if (!best) return null;
     var margin = best.score - (runner ? runner.score : 0);
+    // R-02: when a runner-up exists, carry it as an alternate so the
+    // receipt can offer "not quite right?" one-tap re-routes.
     if (best.score >= 3 && margin >= 2) {
-      return { kind: 'routed', serviceId: best.id, confidence: 0.9, alternates: [] };
+      return { kind: 'routed', serviceId: best.id, confidence: 0.9,
+        alternates: runner ? [runner.id] : [] };
     }
     if (runner) {
       return { kind: 'ambiguous', options: [best.id, runner.id], confidence: 0.4 };
@@ -592,15 +623,15 @@
       return;
     }
     err.textContent = '';
-    // Stop any in-flight recognition so its callbacks cannot overwrite the
-    // submitted text while the resident is already on the next screen.
-    if (recognising && recog) { try { recog.stop(); } catch (e) {} recognising = false; }
     state.text = text;
-    state.cls = debrisGuard(text, C1.classifyResidentText(text));
+    // R-02: routing runs on the typo-tolerant rewrite; the resident's own
+    // words stay untouched for the receipt.
+    var fixed = fixText(text);
+    state.cls = debrisGuard(fixed, C1.classifyResidentText(fixed));
     // R-01: only when the tested engine has no answer does the scenario net
     // run. It can still only emit catalogued service IDs.
     if (state.cls && state.cls.kind === 'unsupported') {
-      var sp = secondPass(text);
+      var sp = secondPass(fixed);
       if (sp) state.cls = sp;
     }
     var k = state.cls.kind;
@@ -618,10 +649,10 @@
   };
 
   function renderClarify() {
-    document.getElementById('clarify-q').textContent = state.cls.question[lang];
+    var q = state.cls.question;
+    document.getElementById('clarify-q').textContent = q[lang] || q.en;
     document.getElementById('clarify-conf').textContent =
-      t('conf') + ': ' + Math.round(state.cls.confidence * 100) + '% — ' +
-      (lang === 'en' ? 'we want to be sure before we send you anywhere.' : 'queremos estar seguros antes de enviarle a algún lado.');
+      t('conf') + ': ' + Math.round(state.cls.confidence * 100) + '% — ' + t('clarifySure');
   }
   window.clarifyAnswer = function (yes) {
     if (yes) { state.cls = { kind: 'routed', serviceId: state.cls.serviceId, confidence: 0.95, alternates: [] }; return buildAndShow(); }
@@ -633,17 +664,19 @@
   function renderChoose() {
     document.getElementById('choose-opts').innerHTML = state.cls.options.map(function (id) {
       var r = C1.serviceCatalog[id];
-      return '<button class="tile" onclick="pick(\'' + id + '\')"><span class="t">' + esc(r.title[lang]) +
+      return '<button class="tile" onclick="pick(\'' + id + '\')"><span class="t">' + esc(r.title[lang] || r.title.en) +
         '</span><span class="s">' + esc(r.responsibleEntity) + '</span></button>';
     }).join('');
   }
 
   function renderEmergency() {
-    var g = C1.EMERGENCY_GUIDANCE[lang];
+    var g = C1.EMERGENCY_GUIDANCE[lang] || C1.EMERGENCY_GUIDANCE.en;
     document.getElementById('em-h').textContent = g.heading;
     document.getElementById('em-b').textContent = g.body;
     document.getElementById('em-911').textContent = g.emergency;
     document.getElementById('em-sh').textContent = g.sheriff;
+    var n = document.getElementById('em-note');
+    if (n) n.textContent = (lang === 'tl' || lang === 'zh') ? t('emNote') : '';
   }
 
   function buildAndShow() {
@@ -686,7 +719,9 @@
     applyLang: applyLang,
     renderClarify: renderClarify,
     renderChoose: renderChoose,
-    renderEmergency: renderEmergency
+    renderEmergency: renderEmergency,
+    TILE_GROUPS: TILE_GROUPS,
+    DEBRIS_QUESTION: DEBRIS_QUESTION
   };
   Object.defineProperty(X, 'lang', { get: function () { return lang; }, set: function (v) { lang = v; } });
   Object.defineProperty(X, 'caseSeed', { get: function () { return caseSeed; }, set: function (v) { caseSeed = v; } });
