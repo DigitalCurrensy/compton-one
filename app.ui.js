@@ -14,17 +14,34 @@
   function buildMsg(kind) {
     var r = state.receipt;
     if (!r || r.kind !== 'action') return '';
-    var en = X.lang === 'en';
-    var conf = state.confirmation || (en ? '[request number]' : '[número de solicitud]');
-    if (en) {
-      if (kind === 'report') return 'Hello — I would like to report: ' + r.title + ', near [nearest cross streets or approximate address]. It has been like this since [date you first saw it]. Can you give me a service request number for this report? (Case ' + r.caseId + ')';
-      if (kind === 'follow') return 'Hello — I am following up on ' + r.title + ', reported on [date]. My service request number is ' + conf + '. What is the current status, and when can I expect action? (Case ' + r.caseId + ')';
-      return 'Hello — I reported ' + r.title + ' on [date], request number ' + conf + '. My follow-up date ' + r.followUpDate + ' has passed with no update. Can this be escalated, and who is supervising the case? (Case ' + r.caseId + ')';
-    }
-    if (kind === 'report') return 'Buenos días — quisiera reportar: ' + r.title + ', cerca de [calles transversales o dirección aproximada]. Está así desde [fecha en que lo vio por primera vez]. ¿Me puede dar un número de solicitud para este reporte? (Caso ' + r.caseId + ')';
-    if (kind === 'follow') return 'Buenos días — doy seguimiento a ' + r.title + ', reportado el [fecha]. Mi número de solicitud es ' + conf + '. ¿Cuál es el estado actual y cuándo puedo esperar acción? (Caso ' + r.caseId + ')';
-    return 'Buenos días — reporté ' + r.title + ' el [fecha], número de solicitud ' + conf + '. Mi fecha de seguimiento ' + r.followUpDate + ' ya pasó sin novedad. ¿Se puede escalar el caso y quién lo supervisa? (Caso ' + r.caseId + ')';
+    var tpl = t(kind === 'report' ? 'msgReportTpl' : kind === 'follow' ? 'msgFollowTpl' : 'msgEscalateTpl');
+    var conf = state.confirmation || t('phConf');
+    return tpl.replace('{title}', r.title).replace('{caseId}', r.caseId)
+      .replace('{conf}', conf).replace('{followUpDate}', r.followUpDate)
+      .replace('{loc}', t('phLoc')).replace('{since}', t('phSince')).replace('{date}', t('phDate'));
   }
+
+  // W-04: the receipt now ACTS. One tap opens the resident's own mail app
+  // with the message written — the app still never sends anything itself.
+  window.emailDraft = function () {
+    var r = state.receipt;
+    if (!r || r.kind !== 'action') return;
+    var body = buildMsg(state.msgKind || 'report');
+    window.location.href = 'mailto:?subject=' + encodeURIComponent('Compton One — ' + r.caseId) +
+      '&body=' + encodeURIComponent(body);
+  };
+
+  window.copyScript = function () {
+    var r = state.receipt;
+    if (!r || r.kind !== 'action') return;
+    var note = document.getElementById('script-note');
+    function done(ok) { if (note && ok) note.textContent = t('scriptCopied'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(r.script).then(function () { done(true); }, function () { done(legacyCopy(r.script)); });
+    } else {
+      done(legacyCopy(r.script));
+    }
+  };
 
   window.msgShow = function (kind) {
     state.msgKind = kind;
@@ -60,7 +77,6 @@
     } else {
       done(legacyCopy(text));
     }
-    track('message_copied', { service_id: sid(), kind: state.msgKind || 'report' });
   };
 
   function renderReceipt() {
@@ -83,9 +99,30 @@
         '<div class="big">' + dest + '</div>' +
         '<div style="font-size:13px;color:var(--ink-60)">' + t('reaches') + ': ' + esc(m.reaches) + '</div>' +
         (m.appliesWhen ? '<div style="font-size:13px;color:var(--ink-60)">' + t('useWhen') + ': ' + esc(m.appliesWhen) + '</div>' : '') +
-        '<div style="font-family:var(--mono);font-size:11px;color:var(--ink-60)">LAST VERIFIED ' + esc(m.lastVerifiedAt) + '</div></div>';
+        '<div style="font-family:var(--mono);font-size:11px;color:var(--ink-60);text-transform:uppercase">' + t('lastVerified') + ' ' + esc(m.lastVerifiedAt) + '</div></div>';
     }).join('');
 
+    // W-05: catalog trust — every receipt carries a one-tap way to report a
+    // wrong number or dead link, prefilled with the service ID.
+    var reportLink = '<div style="font-size:13px;margin-top:8px"><a class="linkbtn" target="_blank" rel="noopener" href="' +
+      'https://github.com/DigitalCurrensy/compton-one/issues/new?title=' +
+      encodeURIComponent('Catalog issue: ' + r.serviceId) + '&body=' +
+      encodeURIComponent('Service: ' + r.title + '\nWhat is wrong (number, link, hours): \n') +
+      '">' + esc(t('reportIssue')) + '</a></div>';
+    // W-06: receipts issue in en/es (the city's working languages); tl/zh
+    // residents get an honest note instead of a silent language switch.
+    var langNote = (X.lang === 'tl' || X.lang === 'zh')
+      ? '<div class="notice n-demo"><span class="ic" aria-hidden="true">i</span><span>' + esc(t('receiptLangNote')) + '</span></div>' : '';
+    // R-02: low-confidence routes offer one-tap alternates.
+    var altIds = (state.cls && state.cls.alternates ? state.cls.alternates : []).filter(function (id) {
+      return id !== r.serviceId && C1.serviceCatalog[id];
+    }).slice(0, 3);
+    var altBlk = (altIds.length && r.confidence < 0.95)
+      ? '<div class="blk noprint"><h3>' + esc(t('altH')) + '</h3><div class="chips">' +
+        altIds.map(function (id) {
+          var rr = C1.serviceCatalog[id];
+          return '<button class="chip" onclick="pick(\'' + id + '\')">' + esc(rr.title[X.lang] || rr.title.en) + '</button>';
+        }).join('') + '</div></div>' : '';
     document.getElementById('receipt').innerHTML =
       '<div class="r-head"><div class="r-meta">' +
         '<span>' + t('mCase') + ' <b>' + esc(r.caseId) + '</b></span>' +
@@ -93,11 +130,11 @@
         '<span>' + t('conf').toUpperCase() + ' <b>' + Math.round(r.confidence * 100) + '%</b></span>' +
         '<span>' + esc(r.jurisdiction.toUpperCase()) + '</span></div>' +
         '<h2>' + esc(r.title) + '</h2></div>' +
-      '<div class="r-body">' +
+      '<div class="r-body">' + langNote + altBlk +
         '<div class="blk"><h3>' + t('yousaid') + '</h3><p class="kv" style="font-style:italic">“' + esc(r.residentSummary) + '”</p></div>' +
         '<div class="blk"><h3>' + t('owner') + '</h3><p class="kv"><b>' + esc(r.owner) + '</b></p></div>' +
         '<div class="blk" id="blk-action"><h3>' + t('action') + '</h3>' + methods +
-          '<div class="notice n-demo" style="margin-top:4px"><span class="ic" aria-hidden="true">▲</span><span>' + esc(r.disclosure) + '</span></div></div>' +
+          '<div class="notice n-demo" style="margin-top:4px"><span class="ic" aria-hidden="true">▲</span><span>' + esc(r.disclosure) + '</span></div>' + reportLink + '</div>' +
         '<div class="blk"><h3>' + t('evidence') + '</h3><ul class="check live" id="evlist">' +
           r.evidence.map(function (e, i) {
             return '<li><label><input type="checkbox" class="evbox" onchange="evidenceTick()" ' +
@@ -115,7 +152,9 @@
           r.prohibited.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul></div>' +
         '<div class="notice n-warn"><span class="ic" aria-hidden="true">▲</span><div><b>' + t('stopFirst') + '</b><ul style="margin:6px 0 0;padding-left:18px">' +
           r.emergencyExclusions.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul></div></div>' +
-        '<div class="blk"><h3>' + t('script') + '</h3><p class="script">' + esc(r.script) + '</p></div>' +
+        '<div class="blk"><h3>' + t('script') + '</h3><p class="script">' + esc(r.script) + '</p>' +
+          '<div class="row noprint" style="margin-top:10px"><button class="btn btn-quiet" onclick="copyScript()">' + esc(t('copyScript')) + '</button></div>' +
+          '<p class="hint" id="script-note" aria-live="polite" style="margin-top:8px"></p></div>' +
         // M-01: ready-to-send message, three moments of the case lifecycle.
         '<div class="blk noprint"><h3>' + t('msgH') + '</h3><p class="hint" style="margin:0">' + t('msgHint') + '</p>' +
           '<div class="msgtabs" role="group" aria-label="' + esc(t('msgH')) + '">' +
@@ -124,7 +163,9 @@
             '<button class="msgtab" id="msgtab-escalate" aria-pressed="false" onclick="msgShow(\'escalate\')">' + esc(t('msgEscalate')) + '</button>' +
           '</div>' +
           '<div class="msgbox" id="msgbox"></div>' +
-          '<div class="row" style="margin-top:10px"><button class="btn btn-quiet" onclick="copyMsg()">' + esc(t('msgCopy')) + '</button></div>' +
+          '<div class="row" style="margin-top:10px"><button class="btn btn-quiet" onclick="copyMsg()">' + esc(t('msgCopy')) + '</button>' +
+            '<button class="btn btn-quiet" onclick="emailDraft()">' + esc(t('emailDraft')) + '</button></div>' +
+          '<p class="hint" style="margin-top:8px">' + esc(t('emailHint')) + '</p>' +
           '<p class="hint" id="msg-note" aria-live="polite" style="margin-top:8px"></p></div>' +
         '<div class="blk"><h3>' + t('save') + '</h3><p class="kv">' + esc(r.expectedConfirmation || '—') + '</p></div>' +
         '<div class="blk"><h3>' + t('follow') + '</h3><p class="kv"><b>' + esc(r.followUpDate) + '</b> — ' + esc(r.followUpCheckpoint) + '</p>' +
@@ -134,8 +175,8 @@
           [t('nextS1'), t('nextS2'), t('nextS3'), t('nextS4')].map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') +
           '</ol></div>' +
         '<div class="blk"><h3>' + t('sources') + '</h3><div class="srcs">' +
-          r.sources.map(function (s) { return '<div>• <a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.label) + '</a> — verified ' + esc(s.lastVerifiedAt) + '</div>'; }).join('') +
-          '<div style="margin-top:4px">Maintainer: ' + esc(r.maintainer) + ' · Next review ' + esc(r.nextReviewAt) + '</div></div></div>' +
+          r.sources.map(function (s) { return '<div>• <a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.label) + '</a> — ' + t('srcVerified') + ' ' + esc(s.lastVerifiedAt) + '</div>'; }).join('') +
+          '<div style="margin-top:4px">' + t('srcMaintainer') + ': ' + esc(r.maintainer) + ' · ' + t('srcNext') + ' ' + esc(r.nextReviewAt) + '</div></div></div>' +
       '</div>';
     restoreEvidenceTicks();
     window.msgShow(state.msgKind || 'report');
@@ -167,30 +208,24 @@
   function renderTimeline() {
     var el = document.getElementById('tl'); if (!el) return;
     var r = state.receipt;
-    var en = X.lang === 'en';
     // AUDIT A-03: the deleted-state message was unreachable, because the
     // null-receipt guard ran first and blanked the timeline silently.
     if (state.deleted) {
       el.innerHTML = '<li><div class="d"></div><div class="dot"><i></i></div><div><div class="st">' +
-        (en ? 'Case deleted' : 'Caso eliminado') + '</div><div class="nt">' +
-        (en ? 'All details for this case were removed from this device.' : 'Todos los detalles de este caso se eliminaron de este dispositivo.') +
-        '</div></div></li>';
+        t('tlCaseDeleted') + '</div><div class="nt">' + t('tlCaseDeletedBody') + '</div></div></li>';
       return;
     }
     if (!r || r.kind !== 'action') { el.innerHTML = ''; return; }
-    var day = en ? ['Today', 'Today', 'Today', 'By ' + r.followUpDate, r.followUpDate]
-                 : ['Hoy', 'Hoy', 'Hoy', 'Para ' + r.followUpDate, r.followUpDate];
+    var day = [t('dayToday'), t('dayToday'), t('dayToday'), t('dayBy') + r.followUpDate, r.followUpDate];
     var rows = [
-      ['HEARD', day[0], en ? 'You described the issue in your own words.' : 'Usted describió el problema en sus propias palabras.', true],
-      ['CLASSIFIED', day[1], (en ? 'Matched to ' : 'Asociado con ') + r.title + ' (' + Math.round(r.confidence * 100) + '%).', true],
-      ['READY', day[2], en ? 'Evidence list and official contact prepared.' : 'Lista de evidencia y contacto oficial preparados.', true],
-      ['SUBMITTED', day[3], state.confirmation
-        ? (en ? 'Confirmation saved: ' : 'Confirmación guardada: ') + state.confirmation
-        : (en ? 'Waiting for you to contact the city and save your confirmation.' : 'Esperando que contacte a la ciudad y guarde su confirmación.'), !!state.confirmation],
-      ['FOLLOW-UP DUE', day[4], en ? 'Check back if you have not heard anything.' : 'Verifique si no ha recibido respuesta.', state.resolved],
-      ['RESOLVED', state.resolved ? day[4] : '—', state.resolved
-        ? (en ? 'You marked this resolved.' : 'Usted marcó esto como resuelto.')
-        : (en ? 'Not yet.' : 'Todavía no.'), state.resolved]
+      [t('stHeard'), day[0], t('tlHeard'), true],
+      [t('stClassified'), day[1], t('tlClassified').replace('{title}', r.title).replace('{pct}', Math.round(r.confidence * 100)), true],
+      [t('stReady'), day[2], t('tlReady'), true],
+      [t('stSubmitted'), day[3], state.confirmation
+        ? t('tlSubSaved').replace('{conf}', state.confirmation)
+        : t('tlSubWait'), !!state.confirmation],
+      [t('stFollowup'), day[4], t('tlFollowDue'), state.resolved],
+      [t('stResolved'), state.resolved ? day[4] : '—', state.resolved ? t('tlResolvedY') : t('tlResolvedN'), state.resolved]
     ];
     var rb = document.getElementById('btn-reopen');
     if (rb) rb.classList.toggle('hidden', !state.resolved);
@@ -238,14 +273,24 @@
   };
 
   window.saveConf = function () {
+    var note = document.getElementById('conf-note');
     var v = document.getElementById('conf').value.trim();
     if (!v) {
+      if (note) { note.textContent = t('confEmpty'); note.style.color = 'var(--amber-ink)'; }
       track('error_shown', { error_code: 'empty_confirmation', view: 'timeline' });
       document.getElementById('conf').focus();
       return;
     }
-    state.confirmation = C1.sanitizeResidentText(v, 60);
+    var clean = C1.sanitizeResidentText(v, 60);
+    // W-02: repeat clicks used to re-save and re-track silently — that is how
+    // one session inflated the "Confirmation recorded" funnel count 7x.
+    if (state.confirmation && clean === state.confirmation) {
+      if (note) { note.textContent = t('confSame'); note.style.color = 'var(--ink-60)'; }
+      return;
+    }
+    state.confirmation = clean;
     track('confirmation_saved', { service_id: sid() });
+    if (note) { note.textContent = t('confSaved'); note.style.color = '#1a7c46'; }
     renderTimeline(); renderDash(); persist();
   };
   window.markResolved = function () {
@@ -279,9 +324,11 @@
     { id: 'C1-1003', sid: 'illegal_dumping', st: 'RESOLVED', age: 5 },
     { id: 'C1-1004', sid: 'pothole', st: 'READY', age: 0 }
   ];
+  var ST_KEY = { 'RESOLVED': 'stResolved', 'FOLLOW-UP DUE': 'stFollowup', 'SUBMITTED': 'stSubmitted',
+    'READY': 'stReady', 'HEARD': 'stHeard', 'CLASSIFIED': 'stClassified' };
   function badge(s) {
     var m = { 'RESOLVED': 'b-res', 'FOLLOW-UP DUE': 'b-due', 'SUBMITTED': 'b-sub', 'READY': 'b-ready' };
-    return '<span class="badge ' + (m[s] || '') + '">' + esc(s) + '</span>';
+    return '<span class="badge ' + (m[s] || '') + '">' + esc(ST_KEY[s] ? t(ST_KEY[s]) : s) + '</span>';
   }
   function renderDash() {
     var savedEl = document.getElementById('saved');
@@ -289,7 +336,8 @@
       var saved = store.list();
       savedEl.innerHTML = saved.length
         ? saved.map(function (c) {
-            var title = C1.serviceCatalog[c.serviceId] ? C1.serviceCatalog[c.serviceId].title[X.lang] : c.serviceId;
+            var rr = C1.serviceCatalog[c.serviceId];
+            var title = rr ? (rr.title[X.lang] || rr.title.en) : c.serviceId;
             return '<div class="caseitem"><span class="id">' + esc(c.caseId) + '</span><span class="ti">' +
               esc(title) + '</span>' + badge(c.status) +
               '<button class="btn btn-quiet" style="padding:9px 14px;min-height:44px" onclick="openSaved(\'' +
@@ -304,17 +352,18 @@
     }
     var resolved = list.filter(function (c) { return c.st === 'RESOLVED'; }).length;
     var due = list.filter(function (c) { return c.st === 'FOLLOW-UP DUE'; }).length;
-    var en = X.lang === 'en';
-    var stats = [[String(list.length), en ? 'Cases' : 'Casos'],
-                 [String(resolved), en ? 'Verified resolved' : 'Resueltos verificados'],
-                 [String(due), en ? 'Follow-up due' : 'Seguimiento pendiente'],
-                 [Math.round(100 * resolved / Math.max(1, list.length)) + '%', en ? 'Outcome rate' : 'Tasa de resultado']];
+    var stats = [[String(list.length), t('statCases')],
+                 [String(resolved), t('statResolved')],
+                 [String(due), t('statDue')],
+                 [Math.round(100 * resolved / Math.max(1, list.length)) + '%', t('statRate')]];
     var se = document.getElementById('stats');
     if (se) se.innerHTML = stats.map(function (s) { return '<div class="stat"><div class="v">' + esc(s[0]) + '</div><div class="l">' + esc(s[1]) + '</div></div>'; }).join('');
     var ce = document.getElementById('cases');
     if (ce) ce.innerHTML = list.map(function (c) {
+      var rr = C1.serviceCatalog[c.sid];
+      var title = rr ? (rr.title[X.lang] || rr.title.en) : c.sid;
       return '<div class="caseitem"><span class="id">' + esc(c.id) + '</span><span class="ti">' +
-        esc(C1.serviceCatalog[c.sid].title[X.lang]) + (c.mine ? ' ★' : '') + '</span>' + badge(c.st) + '</div>';
+        esc(title) + (c.mine ? '<span aria-hidden="true"> ★</span><span class="vh">' + esc(t('yourCaseMark')) + '</span>' : '') + '</span>' + badge(c.st) + '</div>';
     }).join('');
   }
 
@@ -411,10 +460,10 @@
   function gcalUrl() {
     var r = state.receipt;
     var d = String(r.followUpDate).replace(/-/g, '');
-    var next = new Date(r.followUpDate + 'T12:00:00');
-    next.setDate(next.getDate() + 1);
+    var next = new Date(r.followUpDate + 'T00:00:00Z');
+    next.setUTCDate(next.getUTCDate() + 1);
     var d2 = next.toISOString().slice(0, 10).replace(/-/g, '');
-    var title = (X.lang === 'en' ? 'Follow up: ' : 'Seguimiento: ') + r.title + ' (' + r.caseId + ')';
+    var title = t('gcalTitlePfx') + r.title + ' (' + r.caseId + ')';
     var m = r.intakeMethods && r.intakeMethods[0];
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(title) +
       '&dates=' + d + '/' + d2 +
@@ -426,7 +475,7 @@
     window.open(gcalUrl(), '_blank', 'noopener');
     var note = document.getElementById('print-note');
     if (note) note.textContent = t('gcalDone');
-    track('follow_up_scheduled', { service_id: r.serviceId, days_ahead: 0, method: 'gcal' });
+    track('follow_up_scheduled', { service_id: r.serviceId, days_ahead: 0 });
   };
 
   window.downloadIcs = function () {
@@ -435,7 +484,9 @@
     var m = r.intakeMethods && r.intakeMethods[0];
     var ics = C1.buildReminderIcs({
       caseId: r.caseId, title: r.title, owner: r.owner, followUpDate: r.followUpDate,
-      contact: m ? m.destination : '(310) 605-5500', confirmation: state.confirmation, lang: X.lang
+      // ICS copy only exists in en/es inside the tested bundle — coerce.
+      contact: m ? m.destination : '(310) 605-5500', confirmation: state.confirmation,
+      lang: (X.lang === 'es' ? 'es' : 'en')
     });
     // Blob rather than a data: URI — data URIs are blocked or decoded oddly in
     // sandboxed frames and in-app browsers, which is where residents actually are.
@@ -455,7 +506,7 @@
       openFallbackWindow('<pre style="white-space:pre-wrap;font:13px ui-monospace,monospace">' +
         esc(ics) + '</pre>', name);
     }
-    track('follow_up_scheduled', { service_id: r.serviceId, days_ahead: 0, method: 'ics' });
+    track('follow_up_scheduled', { service_id: r.serviceId, days_ahead: 0 });
   };
 
   // Opens content in a new window; if popups are blocked, renders it inline.
@@ -489,21 +540,60 @@
     if (note) note.textContent = t('printFallback');
   };
 
+  // W-03: the privacy panel used to render raw analytics tokens, and the
+  // funnel scaled its bars off the first stage only — seven rage-clicked
+  // saves pushed one bar clean out of the card. Residents read all of it as
+  // leaked backend scripts. Now: friendly translated names, service titles
+  // instead of IDs, consecutive repeats collapsed to ×n, bars as percentages
+  // of the real maximum, and the raw token stream behind a collapsible
+  // technical log for auditors.
+  var FUNNEL_KEYS = { 'Intake started': 'fnl1', 'Issue described': 'fnl2', 'Route recommended': 'fnl3',
+    'Evidence prepared': 'fnl4', 'Official action opened': 'fnl5', 'Confirmation recorded': 'fnl6',
+    'Outcome verified': 'fnl7' };
+  function friendlyEvent(e) {
+    var k = 'evl_' + e.event;
+    var label = (X.T[X.lang] && X.T[X.lang][k]) || X.T.en[k] || e.event.replace(/_/g, ' ');
+    // Resident view: event name plus the service title, nothing else. All
+    // other props (error codes, views, buckets) stay in the technical log.
+    var sid = e.props && e.props.service_id;
+    if (sid && C1.serviceCatalog[sid]) {
+      var rr = C1.serviceCatalog[sid].title;
+      label += ' — ' + (rr[X.lang] || rr.en);
+    }
+    return label;
+  }
   function renderPrivacy() {
     var f = document.getElementById('funnel');
     var l = document.getElementById('evlog');
     if (!f || !l) return;
     var rows = A.funnel();
-    var max = Math.max(1, rows[0].count, 1);
+    var max = 1;
+    rows.forEach(function (r) { if (r.count > max) max = r.count; });
     f.innerHTML = rows.map(function (r) {
-      var w = Math.round(8 + 120 * (r.count / max));
-      return '<div class="r"><span class="lab">' + esc(r.stage) + '</span>' +
-        '<span class="bar" style="width:' + (r.count ? w : 3) + 'px;opacity:' + (r.count ? 1 : .18) + '"></span>' +
+      var pct = r.count ? Math.max(2, Math.round(100 * r.count / max)) : 0;
+      var label = FUNNEL_KEYS[r.stage] ? t(FUNNEL_KEYS[r.stage]) : r.stage;
+      return '<div class="r"><span class="lab">' + esc(label) + '</span>' +
+        '<span class="track"><span class="bar" style="width:' + pct + '%;opacity:' + (r.count ? 1 : .18) + '"></span></span>' +
         '<span class="n">' + r.count + '</span></div>';
     }).join('');
-    var evs = A.drain();
-    l.innerHTML = evs.length
-      ? evs.slice().reverse().map(function (e) {
+    var evs = A.drain().slice().reverse();
+    var merged = [];
+    evs.forEach(function (e) {
+      var sig = e.event + '|' + JSON.stringify(e.props);
+      var last = merged[merged.length - 1];
+      if (last && last.sig === sig) last.n += 1;
+      else merged.push({ sig: sig, e: e, n: 1 });
+    });
+    l.innerHTML = merged.length
+      ? merged.map(function (m) {
+          return '<div class="row2"><span class="p">' + String(m.e.seq).padStart(2, '0') + '</span>' +
+            '<span class="e">' + esc(friendlyEvent(m.e)) + '</span>' +
+            (m.n > 1 ? '<span class="p">×' + m.n + '</span>' : '') + '</div>';
+        }).join('')
+      : '<div class="row2"><span class="p">' + esc(t('evNone')) + '</span></div>';
+    var raw = document.getElementById('rawevlog');
+    if (raw) raw.innerHTML = evs.length
+      ? evs.map(function (e) {
           var props = Object.keys(e.props).map(function (k) { return k + '=' + e.props[k]; }).join(' · ');
           return '<div class="row2"><span class="p">' + String(e.seq).padStart(2, '0') + '</span>' +
             '<span class="e">' + esc(e.event) + '</span><span class="p">' + esc(props) + '</span></div>';
