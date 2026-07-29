@@ -95,6 +95,7 @@ CHECK_NAMES = {
     38: "wave5: channel src registry + verification date exposed",
     39: "wave5: staleness warning appears past threshold (honest aging)",
     40: "wave5: clerk-email drift correction (contactcityclerk@) holds",
+    41: "brand: OG/twitter/meta tags + share assets wired for deploy",
 }
 
 # ---------------------------------------------------------------------------
@@ -731,6 +732,49 @@ def c40():
     return (not probs, "; ".join(probs) if probs else "clerk drift correction in place")
 
 # ---------------------------------------------------------------------------
+# WAVE 6 — brand / social sharing
+# ---------------------------------------------------------------------------
+def jpg_size(path):
+    """(w, h) of a JPEG without any dependency — walks SOF markers."""
+    with open(path, "rb") as f:
+        data = f.read()
+    if data[:2] != b"\xff\xd8":
+        return None
+    i = 2
+    while i + 9 < len(data):
+        if data[i] != 0xFF:
+            i += 1
+            continue
+        marker = data[i + 1]
+        if marker in (0xC0, 0xC1, 0xC2):
+            h = (data[i + 5] << 8) | data[i + 6]
+            w = (data[i + 7] << 8) | data[i + 8]
+            return (w, h)
+        seg = (data[i + 2] << 8) | data[i + 3]
+        i += 2 + seg
+    return None
+
+def c41():
+    html = open(os.path.join(REPO, "index.html"), encoding="utf-8").read()
+    probs = []
+    for frag in ('property="og:image"', 'content="https://compton-one.vercel.app/og.jpg"',
+                 'property="og:image:width"', 'name="twitter:card"', 'summary_large_image',
+                 'rel="apple-touch-icon"', 'favicon-32.png', 'name="theme-color"'):
+        if frag not in html:
+            probs.append(f"missing {frag}")
+    for f in ("og.jpg", "favicon-32.png", "apple-touch-icon.png", "icon-192.png"):
+        if not os.path.exists(os.path.join(REPO, f)):
+            probs.append(f"missing asset {f}")
+    if not probs:
+        sz = jpg_size(os.path.join(REPO, "og.jpg"))
+        if sz != (1200, 630):
+            probs.append(f"og.jpg is {sz}, expected (1200, 630)")
+    pkg = open(os.path.join(REPO, "package.json"), encoding="utf-8").read()
+    if "og.jpg" not in pkg:
+        probs.append("vercel-build does not copy og.jpg")
+    return (not probs, "; ".join(probs) if probs else "og 1200x630 + meta + deploy copy ok")
+
+# ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
 def main():
@@ -791,6 +835,10 @@ def main():
     # WAVE 5 — catalog trust pipeline
     APP.phase = "wave5"
     for f in (c38, c39, c40): run(f)
+
+    # WAVE 6 — brand / social sharing
+    APP.phase = "brand"
+    run(c41)
 
     APP.close()
     srv.shutdown()
