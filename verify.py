@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""COMPTON ONE: FIX — wave-3 + wave-4 functional verification suite.
+"""COMPTON ONE: FIX — wave-3 + wave-4 + wave-5 functional verification suite.
 
 Self-contained: starts its own http.server on an ephemeral port, drives the
 app with Playwright (chromium headless), prints one line per check and exits
@@ -92,6 +92,9 @@ CHECK_NAMES = {
     35: "wave4: phone-only service says so honestly (no fake channel)",
     36: "wave4: send block translates (zh + tl headings)",
     37: "wave4: channel map complete — 22 services, official domains only",
+    38: "wave5: channel src registry + verification date exposed",
+    39: "wave5: staleness warning appears past threshold (honest aging)",
+    40: "wave5: clerk-email drift correction (contactcityclerk@) holds",
 }
 
 # ---------------------------------------------------------------------------
@@ -666,6 +669,68 @@ def c37():
     return (not probs, "; ".join(probs) if probs else "22 services, official domains only")
 
 # ---------------------------------------------------------------------------
+# WAVE 5 — catalog trust pipeline
+# ---------------------------------------------------------------------------
+def c38():
+    probs = []
+    n = APP.eval("Object.keys(C1X.SUBMISSION_CHANNELS).length")
+    if n != 22:
+        probs.append(f"{n} channels, expected 22")
+    ver = APP.eval("C1X.SUBMISSION_VERIFIED || ''")
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", ver):
+        probs.append(f"SUBMISSION_VERIFIED malformed: {ver!r}")
+    if APP.eval("typeof C1X.channelAgeDays") != "function":
+        probs.append("channelAgeDays not exposed")
+    bad = APP.eval("""Object.entries(C1X.SUBMISSION_CHANNELS).flatMap(([id,c]) => {
+      const out = [];
+      if (!Array.isArray(c.src)) out.push(id + ':no-src');
+      if (c.type === 'form' && !(c.src||[]).includes(c.url)) out.push(id + ':form-src-missing-own-url');
+      if (c.type === 'email') {
+        if (!(c.src||[]).length) out.push(id + ':email-no-src');
+        (c.src||[]).forEach(u => { if (!/^https:\\/\\/([a-z0-9.-]+\\.)?comptoncity\\.org\\//.test(u)) out.push(id + ':src-off-domain:' + u); });
+      }
+      return out;
+    })""")
+    if bad:
+        probs.append(f"src registry problems: {bad}")
+    return (not probs, "; ".join(probs) if probs else "22 channels, src registry + VERIFIED ok")
+
+def c39():
+    APP.reload(); run_demo()
+    APP.page.wait_for_timeout(250)
+    probs = []
+    age_far = APP.eval("C1X.channelAgeDays(new Date('2030-06-01'))")
+    age_near = APP.eval("C1X.channelAgeDays(new Date('2026-08-01'))")
+    if not (isinstance(age_far, int) and age_far > 45):
+        probs.append(f"far-future age should exceed threshold, got {age_far}")
+    if not (isinstance(age_near, int) and 0 <= age_near <= 45):
+        probs.append(f"near age should be within threshold, got {age_near}")
+    # Force staleness into the DOM via a re-render, then restore.
+    orig = APP.eval("C1X.SUBMISSION_VERIFIED")
+    APP.eval("C1X.SUBMISSION_VERIFIED = '2020-01-01'")
+    APP.eval("setLang('es')"); APP.page.wait_for_timeout(250)
+    if not APP.page.query_selector("#send-stale"):
+        probs.append("no #send-stale warning after forcing an old VERIFIED")
+    APP.eval(f"C1X.SUBMISSION_VERIFIED = '{orig}'")
+    APP.eval("setLang('en')"); APP.page.wait_for_timeout(250)
+    if APP.page.query_selector("#send-stale"):
+        probs.append("#send-stale did not clear after restoring VERIFIED")
+    errs = APP.errors_since(0)
+    if errs:
+        probs.append(f"console errors: {errs[:1]}")
+    return (not probs, "; ".join(probs) if probs else f"age far={age_far} near={age_near}, stale note toggles")
+
+def c40():
+    probs = []
+    em = APP.eval("C1X.SUBMISSION_CHANNELS.public_records.email || ''")
+    if em != "contactcityclerk@comptoncity.org":
+        probs.append(f"public_records email is {em!r}, expected the currently-published clerk address")
+    stale = APP.eval("Object.entries(C1X.SUBMISSION_CHANNELS).filter(([id,c]) => (c.email||'').includes('contactcc@')).map(([id]) => id)")
+    if stale:
+        probs.append(f"stale contactcc@ still referenced by: {stale}")
+    return (not probs, "; ".join(probs) if probs else "clerk drift correction in place")
+
+# ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
 def main():
@@ -722,6 +787,10 @@ def main():
     # WAVE 4 — submission channels
     APP.phase = "wave4"
     for f in (c33, c34, c35, c36, c37): run(f)
+
+    # WAVE 5 — catalog trust pipeline
+    APP.phase = "wave5"
+    for f in (c38, c39, c40): run(f)
 
     APP.close()
     srv.shutdown()
