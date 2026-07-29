@@ -39,6 +39,16 @@ link? Report it" channel, because a stale number is a broken promise.
 
 ---
 
+## See it
+
+**Live:** [compton-one.vercel.app](https://compton-one.vercel.app) — built phone-first.
+
+| Landing — 22 services, 4 languages | Civic Action Receipt | Message Studio |
+|---|---|---|
+| ![Landing](shots/01-landing.png) | ![Receipt](shots/03-receipt.png) | ![Message Studio](shots/05-message-studio.png) |
+
+---
+
 ## Run it — no build, no server
 
 ```
@@ -47,9 +57,10 @@ open index.html        # or compton-one-fix.html — same page
 
 The page loads `bundle.js` (the tested, compiled TypeScript engine), `app.js`
 (controller part 1: state, strings, routing), `app.langs.js` (Tagalog + 中文
-language pack and bundle-boundary patches) and `app.ui.js` (controller part 2:
-receipt, timeline, dashboard, boot) from the same folder — **keep the five files
-together**. No server, no network calls, no account.
+language pack and bundle-boundary patches), `app.ui.js` (controller part 2:
+receipt, timeline, dashboard, boot) and `app.send.js` (verified submission
+channels + send block) from the same folder — **keep the six files together**.
+No server, no network calls, no account.
 
 Press **Run the demo scenario** for the 60-second guided path.
 
@@ -77,7 +88,7 @@ python3 scripts/verify-channels.py   # wave 5: re-verify official submission cha
 ## Layout
 
 ```
-index.html              Entry point — loads bundle.js + app.js + app.langs.js + app.ui.js
+index.html              Entry point — loads all five scripts (bundle + 4 controllers)
 compton-one-fix.html    Same page, legacy name (kept for existing links)
 app.template.html       Markup + design system (source for the HTML)
 app.js                  Controller part 1 — state, strings, routing (no build step)
@@ -88,13 +99,20 @@ entry.ts                TypeScript entry point; exports C1 to window
 bundle.js               esbuild output of entry.ts + lib/ (committed, loaded as-is)
 verify.py               Browser checks (requires playwright)
 scripts/build-check.sh  Pre-deploy gate (mirrors CI)
+scripts/verify-channels.py  Wave 5 — channel drift tripwire
 tests/                  Unit tests (stubs — lib/ sources not yet committed)
 media/                  Architecture, journey, before/after, title, teaser
 shots/                  Screenshots produced by verify.py
+wave-6_Compton- one-逻辑/brand-assets/  Brand images (OG card + favicon/touch icons);
+                        copied into public/ by vercel-build — uploaded via web UI
 docs/
   SERVICE-CATALOG.md    22 verified city service routes (source of truth)
   ARCHITECTURE.md       Design decisions and security model
-  SPEC.md               Full repository specification
+  SPEC.md               Original design spec (2026-07-27, historical — this README is current)
+  ROADMAP.md            Waves shipped + ranked backlog
+  HOW-IT-WORKS.md       Plain-language walkthrough of the platform
+  REPLICATE.md          Stand this up for your own city
+  HACKATHON.md          The pitch — problem, demo, differentiators
 ```
 
 ---
@@ -215,6 +233,26 @@ the quarterly manual catalog review into an always-on tripwire.
   opens a GitHub issue with the report when a channel drifts.
 
 `verify.py` now runs **40 checks** (37 + 3 wave-5), all PASS.
+
+---
+
+## Wave 6 — brand: social sharing, favicon, mobile icons (2026-07-29)
+
+The link is the demo — most people will meet this project as a pasted URL.
+Wave 6 makes that first impression carry the brand:
+
+- **Open Graph + Twitter card meta** on both entry points (and the template):
+  `og.jpg` (1200×630), absolute `compton-one.vercel.app` URLs,
+  `summary_large_image`, meta description, `theme-color` matching `--night`.
+- **Icons** derived from the project logo: `favicon-32.png`,
+  `apple-touch-icon.png` (iOS home screen), `icon-192.png` (Android/PWA).
+- **Deploy wiring** — `vercel-build` copies the four images into `public/`;
+  `scripts/build-check.sh` gained a brand gate (step 7) that fails the build
+  if the OG wiring or assets go missing.
+- The OG description states the honest scope: the app routes residents to the
+  verified official channel — it never submits to the city.
+
+`verify.py` now runs **41 checks** (40 + 1 brand), all PASS.
 
 ---
 
