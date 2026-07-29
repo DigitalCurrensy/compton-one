@@ -14,6 +14,15 @@
       line — the app never sends anything itself.
    3. Overrides window.emailDraft so the draft carries the verified To address
       and the message currently shown in the Message Studio.
+
+   Wave 5 (catalog trust pipeline, 2026-07-29):
+   - Every channel now declares src[] — the official page(s) that publish it,
+     re-checked on a schedule by scripts/verify-channels.py.
+   - VERIFIED is exposed (X.SUBMISSION_VERIFIED) and aged; past
+     STALE_AFTER_DAYS the send block warns that re-verification is due.
+   - First pipeline catch applied: public_records moved to
+     contactcityclerk@comptoncity.org — the official City Clerk page no longer
+     publishes contactcc@ (verified via comptoncity.org 2026-07-29).
 */
 (function () {
   var X = window.C1X;
@@ -31,7 +40,8 @@
       sendPhoneNote: 'This route is phone-only — no official online form or published email could be verified. Call with the script above.',
       sendVerified: 'Channel verified {date}',
       sendAppNote: 'You can also report street maintenance in the official City of Compton app (see comptoncity.org/services/compton-app).',
-      sendNever: 'You press send — always. Nothing is ever transmitted by this app.'
+      sendNever: 'You press send — always. Nothing is ever transmitted by this app.',
+      sendStale: 'Re-verification due — this channel was last checked {date}. If it fails, use the Report it link below.'
     },
     es: {
       sendH: 'Envíe su reporte',
@@ -42,7 +52,8 @@
       sendPhoneNote: 'Esta ruta es solo por teléfono — no se pudo verificar un formulario en línea ni un correo oficial. Llame con el guion de arriba.',
       sendVerified: 'Canal verificado el {date}',
       sendAppNote: 'También puede reportar mantenimiento de calles en la aplicación oficial de la Ciudad de Compton (vea comptoncity.org/services/compton-app).',
-      sendNever: 'Usted presiona enviar — siempre. Esta aplicación nunca transmite nada.'
+      sendNever: 'Usted presiona enviar — siempre. Esta aplicación nunca transmite nada.',
+      sendStale: 'Verificación pendiente — este canal se comprobó por última vez el {date}. Si falla, use el enlace «Reportarlo» de abajo.'
     },
     tl: {
       sendH: 'Ipadala ang inyong report',
@@ -53,7 +64,8 @@
       sendPhoneNote: 'Phone-only ang rutang ito — walang opisyal na online form o na-verify na email. Tumawag gamit ang script sa itaas.',
       sendVerified: 'Na-verify ang channel noong {date}',
       sendAppNote: 'Maaari rin kayong mag-report ng street maintenance sa opisyal na City of Compton app (tingnan ang comptoncity.org/services/compton-app).',
-      sendNever: 'Kayo ang pipindot ng send — palagi. Walang ipinapadala ang app na ito kailanman.'
+      sendNever: 'Kayo ang pipindot ng send — palagi. Walang ipinapadala ang app na ito kailanman.',
+      sendStale: 'Dapat nang i-verify muli — huling sinuri ang channel na ito noong {date}. Kung hindi ito gumana, gamitin ang link na I-report sa ibaba.'
     },
     zh: {
       sendH: '发送您的报告',
@@ -64,7 +76,8 @@
       sendPhoneNote: '此渠道仅限电话——未能核实到官方在线表格或公开邮箱。请使用上方话术拨打电话。',
       sendVerified: '渠道核实日期 {date}',
       sendAppNote: '您也可以通过康普顿市官方 App 报告街道维护问题（见 comptoncity.org/services/compton-app）。',
-      sendNever: '始终由您点击发送——本应用从不传输任何内容。'
+      sendNever: '始终由您点击发送——本应用从不传输任何内容。',
+      sendStale: '此渠道需要重新核实——上次核实日期为 {date}。如失效，请使用下方的“报告问题”链接。'
     }
   };
   function s(k) {
@@ -73,32 +86,69 @@
   }
 
   // ---------- the verified channel map (2026-07-29) ----------
+  // wave 5: VERIFIED is exposed and aged; scripts/verify-channels.py re-fetches
+  // every src below on a schedule and bumps this date after a clean pass.
+  // src = the official page(s) that publish the channel (forms check themselves).
   var VERIFIED = '2026-07-29';
+  var STALE_AFTER_DAYS = 45;
+  X.SUBMISSION_VERIFIED = VERIFIED;
+  X.channelAgeDays = function (now) {
+    var t = (now instanceof Date) ? now : new Date();
+    return Math.floor((t.getTime() - Date.parse(X.SUBMISSION_VERIFIED + 'T00:00:00Z')) / 86400000);
+  };
   var CHANNELS = {
-    illegal_dumping:  { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/illegal-dumping' },
-    graffiti:         { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/graffiti' },
-    code_violation:   { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/code-violations' },
-    animal_control:   { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/animal-control' },
-    streetlight:      { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/outage-street-light-compton' },
-    power_outage:     { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/outage-power' },
-    parking_citation: { type: 'form', url: 'https://www.pticket.com/compton/' },
-    pothole:          { type: 'email', email: 'contactpw@comptoncity.org' },
-    sidewalk:         { type: 'email', email: 'contactpw@comptoncity.org' },
-    street_tree:      { type: 'email', email: 'contactpw@comptoncity.org' },
-    traffic_sign_signal: { type: 'email', email: 'contactpw@comptoncity.org' },
-    storm_drain:      { type: 'email', email: 'contactpw@comptoncity.org' },
-    missed_trash:     { type: 'email', email: 'contacttrash@comptoncity.org' },
-    bulky_item:       { type: 'email', email: 'contacttrash@comptoncity.org' },
-    recycling_ewaste: { type: 'email', email: 'contacttrash@comptoncity.org' },
-    water_or_sewer:   { type: 'email', email: 'cwdcd@comptoncity.org' },
-    utility_billing:  { type: 'email', email: 'cwdcd@comptoncity.org' },
-    housing_help:     { type: 'email', email: 'contactlh@comptoncity.org' },
-    homeless_outreach:{ type: 'email', email: 'contactlh@comptoncity.org' },
-    public_records:   { type: 'email', email: 'contactcc@comptoncity.org' },
-    business_permit:  { type: 'email', email: 'contactbl@comptoncity.org' },
+    illegal_dumping:  { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/illegal-dumping',
+                        src: ['https://www.comptoncity.org/i-want-to/report/illegal-dumping'] },
+    graffiti:         { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/graffiti',
+                        src: ['https://www.comptoncity.org/i-want-to/report/graffiti'] },
+    code_violation:   { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/code-violations',
+                        src: ['https://www.comptoncity.org/i-want-to/report/code-violations'] },
+    animal_control:   { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/animal-control',
+                        src: ['https://www.comptoncity.org/i-want-to/report/animal-control'] },
+    streetlight:      { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/outage-street-light-compton',
+                        src: ['https://www.comptoncity.org/i-want-to/report/outage-street-light-compton'] },
+    power_outage:     { type: 'form', url: 'https://www.comptoncity.org/i-want-to/report/outage-power',
+                        src: ['https://www.comptoncity.org/i-want-to/report/outage-power'] },
+    parking_citation: { type: 'form', url: 'https://www.pticket.com/compton/',
+                        src: ['https://www.pticket.com/compton/'] },
+    pothole:          { type: 'email', email: 'contactpw@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/public-works'] },
+    sidewalk:         { type: 'email', email: 'contactpw@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/public-works'] },
+    street_tree:      { type: 'email', email: 'contactpw@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/public-works'] },
+    traffic_sign_signal: { type: 'email', email: 'contactpw@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/public-works'] },
+    storm_drain:      { type: 'email', email: 'contactpw@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/public-works'] },
+    missed_trash:     { type: 'email', email: 'contacttrash@comptoncity.org',
+                        src: ['https://www.comptoncity.org/services/waste-and-recycling',
+                              'https://www.comptoncity.org/departments/municipal-utilities'] },
+    bulky_item:       { type: 'email', email: 'contacttrash@comptoncity.org',
+                        src: ['https://www.comptoncity.org/services/waste-and-recycling',
+                              'https://www.comptoncity.org/departments/municipal-utilities'] },
+    recycling_ewaste: { type: 'email', email: 'contacttrash@comptoncity.org',
+                        src: ['https://www.comptoncity.org/services/waste-and-recycling',
+                              'https://www.comptoncity.org/departments/municipal-utilities'] },
+    water_or_sewer:   { type: 'email', email: 'cwdcd@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/municipal-utilities/water-department/contact-us',
+                              'https://www.comptoncity.org/i-want-to/get/utility-services'] },
+    utility_billing:  { type: 'email', email: 'cwdcd@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/municipal-utilities/water-department/contact-us',
+                              'https://www.comptoncity.org/i-want-to/get/utility-services'] },
+    housing_help:     { type: 'email', email: 'contactlh@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/housing-authority'] },
+    homeless_outreach:{ type: 'email', email: 'contactlh@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/housing-authority'] },
+    // wave 5 correction: the official City Clerk page no longer publishes
+    // contactcc@ — it now shows contactcityclerk@ (verified 2026-07-29).
+    public_records:   { type: 'email', email: 'contactcityclerk@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/city-clerk'] },
+    business_permit:  { type: 'email', email: 'contactbl@comptoncity.org',
+                        src: ['https://www.comptoncity.org/departments/public-safety'] },
     // No official written channel could be verified for abandoned vehicles —
     // the receipt's verified phone path stands, and we say so honestly.
-    abandoned_vehicle:{ type: 'phone' }
+    abandoned_vehicle:{ type: 'phone', src: [] }
   };
   X.SUBMISSION_CHANNELS = CHANNELS;
 
@@ -121,11 +171,17 @@
     } else {
       inner = '<p style="font-size:14px;color:#F2EFE5CC;margin-top:12px">' + esc(s('sendPhoneNote')) + '</p>';
     }
+    // wave 5: honesty about verification age — past threshold, say so on the card.
+    var staleNote = X.channelAgeDays() > STALE_AFTER_DAYS
+      ? '<p id="send-stale" style="font-size:12.5px;color:var(--paper);border:1px solid var(--amber);border-radius:8px;padding:8px 10px;margin-top:10px">' +
+        esc(s('sendStale').replace('{date}', VERIFIED)) + '</p>'
+      : '';
     return '<div class="blk" id="send-block" style="background:var(--night);color:var(--paper);border-radius:14px;padding:18px;margin-top:4px">' +
       '<h3 style="color:var(--signal)">' + esc(s('sendH')) + '</h3>' +
       inner +
       '<p style="font-family:var(--mono);font-size:11px;color:var(--concrete);margin-top:12px;letter-spacing:.06em;text-transform:uppercase">' +
       esc(s('sendVerified').replace('{date}', VERIFIED)) + ' · ' + esc(s('sendNever')) + '</p>' +
+      staleNote +
       '<p style="font-size:13px;color:var(--concrete);margin-top:8px">' + esc(s('sendAppNote')) + '</p>' +
       '</div>';
   }

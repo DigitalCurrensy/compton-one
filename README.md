@@ -63,6 +63,7 @@ npm install
 npx vitest run                  # unit tests (requires lib/ sources — see note below)
 npx tsc --noEmit                # strict TypeScript (requires lib/ sources)
 python3 verify.py               # browser-journey checks (requires playwright)
+python3 scripts/verify-channels.py   # wave 5: re-verify official submission channels
 ```
 
 > **Repo note (2026-07-28):** the `lib/` TypeScript sources and the filled test
@@ -167,7 +168,8 @@ pticket.com/compton, sce.com — accessed 2026-07-29), and every receipt gains a
   Studio text in.
 - **13 official published email addresses** (Public Works `contactpw@`,
   Waste `contacttrash@`, Water `cwdcd@`, Housing `contactlh@`, City Clerk
-  `contactcc@`, Business License `contactbl@` — all @comptoncity.org). The
+  `contactcityclerk@` — corrected from `contactcc@` in wave 5, see below —
+  Business License `contactbl@`; all @comptoncity.org). The
   receipt's one-tap email draft now carries the verified To address and the
   exact message the resident sees.
 - **1 honest phone-only route** (abandoned vehicles): no official written
@@ -181,6 +183,38 @@ Implementation: a self-contained module, `app.send.js` (5th script), that wraps
 as `C1X.SUBMISSION_CHANNELS`. Doctrine holds: **the app never sends anything
 itself** — the resident always presses send, and the block says so in all four
 languages. `verify.py` now runs 37 checks (32 wave-3 + 5 wave-4), all PASS.
+
+---
+
+## Wave 5 — catalog trust pipeline (2026-07-29)
+
+The verified catalog is an asset and a liability: one stale channel quietly
+breaks trust with exactly the resident who needed it most. This wave converts
+the quarterly manual catalog review into an always-on tripwire.
+
+- **`scripts/verify-channels.py`** — re-fetches every channel's official
+  source (form URLs directly; the official city pages that publish each email —
+  CivicPlus hides addresses behind `mailto:` "Email" links, so raw markup is
+  searched, not rendered text). A real page that lost the address = drift
+  (exit 1 + Markdown report); a bot-wall challenge page = inconclusive and
+  retried, never auto-failed. `--update-date` bumps the in-app verification
+  date after a fully clean pass.
+- **Per-channel `src` registry** on `C1X.SUBMISSION_CHANNELS` — every channel
+  declares the official page(s) that publish it; the checker parses the map
+  straight out of `app.send.js` (single source of truth, no drift between
+  data and checker).
+- **Honest aging on the receipt** — `X.SUBMISSION_VERIFIED` is exposed; past
+  45 days the send block warns that re-verification is due instead of silently
+  showing an old "verified" stamp.
+- **First catch, applied same-day** — the official City Clerk page no longer
+  publishes `contactcc@`; it now shows `contactcityclerk@comptoncity.org`.
+  The `public_records` channel is corrected in this wave. This is the pipeline
+  working as designed.
+- **Weekly CI** (`.github/workflows/channel-verify.yml`, added via web UI —
+  the bot token lacks the `workflow` scope) runs the checker on a schedule and
+  opens a GitHub issue with the report when a channel drifts.
+
+`verify.py` now runs **40 checks** (37 + 3 wave-5), all PASS.
 
 ---
 
@@ -216,7 +250,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full design rationale
 
 ## Rebuild after editing `app.template.html`
 
-The HTML is assembled by replacing four placeholders:
+The HTML is assembled by replacing five placeholders:
 
 ```bash
 python3 - <<'EOF'
@@ -233,7 +267,10 @@ out = (t.replace('<script>
 </script>', '<script src="app.langs.js"></script>')
         .replace('<script>
 /*__APPUI__*/
-</script>', '<script src="app.ui.js"></script>'))
+</script>', '<script src="app.ui.js"></script>')
+        .replace('<script>
+/*__APPSEND__*/
+</script>', '<script src="app.send.js"></script>'))
 pathlib.Path('compton-one-fix.html').write_text(out)
 pathlib.Path('index.html').write_text(out)
 EOF
