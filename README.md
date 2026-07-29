@@ -43,9 +43,9 @@ link? Report it" channel, because a stale number is a broken promise.
 
 **Live:** [compton-one.vercel.app](https://compton-one.vercel.app) — built phone-first.
 
-| Landing — 22 services, 4 languages | Civic Action Receipt | Message Studio |
+| Landing — 22 services, 4 languages | Civic Action Receipt | El recibo — en Español |
 |---|---|---|
-| ![Landing](shots/01-landing.png) | ![Receipt](shots/03-receipt.png) | ![Message Studio](shots/05-message-studio.png) |
+| ![Landing](shots/01-landing.png) | ![Receipt](shots/03-receipt.png) | ![Receipt in Spanish](shots/08-receipt-es.png) |
 
 ---
 
@@ -294,21 +294,11 @@ The HTML is assembled by replacing five placeholders:
 python3 - <<'EOF'
 import pathlib
 t = pathlib.Path('app.template.html').read_text()
-out = (t.replace('<script>
-/*__BUNDLE__*/
-</script>', '<script src="bundle.js"></script>')
-        .replace('<script>
-/*__APP__*/
-</script>', '<script src="app.js"></script>')
-        .replace('<script>
-/*__APPLANGS__*/
-</script>', '<script src="app.langs.js"></script>')
-        .replace('<script>
-/*__APPUI__*/
-</script>', '<script src="app.ui.js"></script>')
-        .replace('<script>
-/*__APPSEND__*/
-</script>', '<script src="app.send.js"></script>'))
+out = (t.replace('<script>\n/*__BUNDLE__*/\n</script>', '<script src="bundle.js"></script>')
+        .replace('<script>\n/*__APP__*/\n</script>', '<script src="app.js"></script>')
+        .replace('<script>\n/*__APPLANGS__*/\n</script>', '<script src="app.langs.js"></script>')
+        .replace('<script>\n/*__APPUI__*/\n</script>', '<script src="app.ui.js"></script>')
+        .replace('<script>\n/*__APPSEND__*/\n</script>', '<script src="app.send.js"></script>'))
 pathlib.Path('compton-one-fix.html').write_text(out)
 pathlib.Path('index.html').write_text(out)
 EOF
