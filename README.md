@@ -43,9 +43,11 @@ link? Report it" channel, because a stale number is a broken promise.
 
 **Live:** [compton-one.vercel.app](https://compton-one.vercel.app) — built phone-first.
 
-| Landing — 22 services, 4 languages | Civic Action Receipt | El recibo — en Español |
+| Landing | Action plan | Receipt |
 |---|---|---|
-| ![Landing](shots/01-landing.png) | ![Receipt](shots/03-receipt.png) | ![Receipt in Spanish](shots/08-receipt-es.png) |
+| ![Landing](image1) | ![Action plan](image2) | ![Receipt](image3) |
+
+**Demo video:** [compton-one-demo.mp4](compton-one-demo.mp4)
 
 ---
 
