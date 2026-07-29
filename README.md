@@ -43,17 +43,21 @@ link? Report it" channel, because a stale number is a broken promise.
 
 **Live:** [compton-one.vercel.app](https://compton-one.vercel.app) — built phone-first.
 
-![Compton One hero](shots/01-landing.png)
-
-### Screenshots
-
-| Landing | Action plan | Receipt |
+| Landing — 22 services, 4 languages | Civic Action Receipt | El recibo — en Español |
 |---|---|---|
-| ![Landing](shots/01-landing.png) | ![Action plan](shots/02-action-plan.png) | ![Receipt](shots/03-receipt.png) |
+| ![Landing](shots/01-landing.png) | ![Receipt](shots/03-receipt.png) | ![Receipt in Spanish](shots/08-receipt-es.png) |
 
 ### Demo video
 
-[![Watch the demo video](shots/demo-thumb.png)](compton-one-demo.mp4)
+**45-second guided journey** — landing → describe → Civic Action Receipt →
+Español → save → track → privacy panel.
+
+<!-- Maintainer note, invisible to readers: drag compton-one-demo.mp4 into the
+     GitHub README editor on the line below — GitHub uploads it and embeds a
+     native player automatically. Delete this comment after. -->
+
+The same journey, live: **[compton-one.vercel.app](https://compton-one.vercel.app)**
+→ press "Run the demo scenario".
 
 ---
 
@@ -111,7 +115,7 @@ scripts/verify-channels.py  Wave 5 — channel drift tripwire
 tests/                  Unit tests (stubs — lib/ sources not yet committed)
 media/                  Architecture, journey, before/after, title, teaser
 shots/                  Screenshots produced by verify.py
-wave-6_Compton- one-logic/brand-assets/  Brand images (OG card + favicon/touch icons);
+wave-6_Compton- one-逻辑/brand-assets/  Brand images (OG card + favicon/touch icons);
                         copied into public/ by vercel-build — uploaded via web UI
 docs/
   SERVICE-CATALOG.md    22 verified city service routes (source of truth)
