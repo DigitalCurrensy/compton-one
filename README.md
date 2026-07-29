@@ -43,11 +43,17 @@ link? Report it" channel, because a stale number is a broken promise.
 
 **Live:** [compton-one.vercel.app](https://compton-one.vercel.app) — built phone-first.
 
+![Compton One hero](shots/01-landing.png)
+
+### Screenshots
+
 | Landing | Action plan | Receipt |
 |---|---|---|
-| ![Landing](image1) | ![Action plan](image2) | ![Receipt](image3) |
+| ![Landing](shots/01-landing.png) | ![Action plan](shots/02-action-plan.png) | ![Receipt](shots/03-receipt.png) |
 
-**Demo video:** [compton-one-demo.mp4](compton-one-demo.mp4)
+### Demo video
+
+[![Watch the demo video](shots/demo-thumb.png)](compton-one-demo.mp4)
 
 ---
 
@@ -105,7 +111,7 @@ scripts/verify-channels.py  Wave 5 — channel drift tripwire
 tests/                  Unit tests (stubs — lib/ sources not yet committed)
 media/                  Architecture, journey, before/after, title, teaser
 shots/                  Screenshots produced by verify.py
-wave-6_Compton- one-逻辑/brand-assets/  Brand images (OG card + favicon/touch icons);
+wave-6_Compton- one-logic/brand-assets/  Brand images (OG card + favicon/touch icons);
                         copied into public/ by vercel-build — uploaded via web UI
 docs/
   SERVICE-CATALOG.md    22 verified city service routes (source of truth)
