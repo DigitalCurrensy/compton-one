@@ -49,12 +49,8 @@ link? Report it" channel, because a stale number is a broken promise.
 
 ### Demo video
 
-**45-second guided journey** — landing → describe → Civic Action Receipt →
-Español → save → track → privacy panel.
-
-<!-- Maintainer note, invisible to readers: drag compton-one-demo.mp4 into the
-     GitHub README editor on the line below — GitHub uploads it and embeds a
-     native player automatically. Delete this comment after. -->
+**[▶ Watch the 45-second guided journey](compton-one-demo.mp4)** — landing →
+describe → Civic Action Receipt → Español → save → track → privacy panel.
 
 The same journey, live: **[compton-one.vercel.app](https://compton-one.vercel.app)**
 → press "Run the demo scenario".
