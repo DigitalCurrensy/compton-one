@@ -1,338 +1,297 @@
-# COMPTON ONE: FIX
+# COMPTON ONE : FIX
 
 **One problem. One path forward.**
 
-A civic service navigation prototype for Compton, California, with a four-language
-interface (English, Español, Tagalog, 中文). A resident describes a city service
-problem in plain language; the app identifies the correct department from a catalog
-of **22 verified city service routes**, lists the evidence to gather, hands off to
-the official channel with a prepared call script and ready-to-send message, issues
-a **Civic Action Receipt** with a **one-tap submission action** (wave 4), and
-tracks the case to a recorded outcome.
+A phone-first civic navigator for residents of Compton, California.
+Describe a city problem in your own words — English, Español, Tagalog, or 中文 — and the app finds the **one official next step**: the right department, a verified phone number or form, a checklist of what to gather, and a ready-to-use call script.
 
-**22 routes catalogued and routed.** Each carries a verified phone number or URL,
-the responsible department, and a `verificationState` (`officially_verified` or
-`needs_confirmation`) sourced directly from official City of Compton pages on
-2026-07-27. The catalog finding that justifies this product: **13 of 22 routes
-have no dedicated online intake form at all** — they are phone-only barriers for
-residents who work business hours or who are Deaf or hard of hearing.
-Every receipt shows the verification date and a one-tap "wrong number or dead
-link? Report it" channel, because a stale number is a broken promise.
+It does **not** file the report for you. It does **not** talk to a city server. It does **not** use AI to guess a department.
 
-**How routing works (two deterministic passes, no LLM anywhere):**
-1. The tested engine (`bundle.js`) scores the description against its keyword
-   tables — a core tier tuned for the five most common services plus an extended
-   tier covering the rest of the catalog — and handles the emergency gate.
-2. If — and only if — the engine returns *unsupported*, the controller's
-   **scenario engine** (patch R-01) scores the description against ~30 plain-language
-   phrase groups (EN/ES, strong/medium/weak) covering all 22 services, and routes
-   or asks an either/or question. Before both passes, a curated rewrite table
-   (patch R-02) repairs common typos and phrasing variants ("pot hole", "grafitti",
-   "lost my dog"), and an order-free word-set scorer catches interpolated phrasing.
-   Low-confidence routes carry one-tap "not quite right?" alternates on the receipt.
-   Every path can only emit known catalog IDs; when nothing matches, the app says
-   so honestly, with the verified city main line.
+<p align="center">
+  <img src="shots/01-landing.png" alt="COMPTON ONE landing page — One problem. One path forward. Four languages and 22 city services." width="920">
+</p>
 
-> **Scope:** This prototype prepares and tracks a resident's action. It does not
-> submit anything to the City of Compton. That limit is stated on the landing page,
-> on every receipt, and in the footer.
+<p align="center">
+  <a href="https://compton-one.vercel.app"><strong>Open the live app</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/DigitalCurrensy/compton-one/blob/main/compton-one-demo.mp4"><strong>Watch the 45-second video</strong></a>
+  &nbsp;·&nbsp;
+  <a href="docs/USAGE.md"><strong>How to use it</strong></a>
+</p>
+
+| Live app | Languages | City routes | Routing | Data |
+|---|---|---|---|---|
+| [compton-one.vercel.app](https://compton-one.vercel.app) | English · Español · Tagalog · 中文 | 22 verified Compton services | Keyword matching. No AI. | Stays on your phone |
 
 ---
 
-## See it
+## Why it exists
 
-**Live:** [compton-one.vercel.app](https://compton-one.vercel.app) — built phone-first.
+Most Compton service requests still start with “who do I even call?”
 
-| Landing — 22 services, 4 languages | Civic Action Receipt | El recibo — en Español |
-|---|---|---|
-| ![Landing](shots/01-landing.png) | ![Receipt](shots/03-receipt.png) | ![Receipt in Spanish](shots/08-receipt-es.png) |
+**13 of the 22 official routes have no online form.** They are phone-only, during business hours. That is a real barrier if you work those hours, if English is not your first language, or if you are Deaf or hard of hearing.
+
+COMPTON ONE is the missing front door:
+
+1. You describe what you saw.
+2. The app matches it to one of 22 catalogued city services.
+3. You leave with a **Civic Action Receipt** — official contact, evidence list, script, and a way to track what happens next.
+
+Independent prototype. Not operated by the City of Compton.
+
+---
+
+## See the platform
 
 ### Demo video
 
-**[▶ Watch the 45-second guided journey](compton-one-demo.mp4)** — landing →
-describe → Civic Action Receipt → Español → save → track → privacy panel.
+**[Play the 45-second guided journey →](https://github.com/DigitalCurrensy/compton-one/blob/main/compton-one-demo.mp4)**
 
-The same journey, live: **[compton-one.vercel.app](https://compton-one.vercel.app)**
-→ press "Run the demo scenario".
+Landing → describe the problem → Civic Action Receipt → switch to Español → save the case → track it → open the privacy panel.
+
+Same path, live: open [compton-one.vercel.app](https://compton-one.vercel.app) and press **Run the demo scenario**.
+
+### Screenshots
+
+| Landing — 22 services, 4 languages | Civic Action Receipt |
+|---|---|
+| ![Landing](shots/01-landing.png) | ![Receipt](shots/03-receipt.png) |
+
+| Recibo en Español | Phone receipt |
+|---|---|
+| ![Spanish receipt](shots/08-receipt-es.png) | ![Mobile receipt](shots/09-mobile-receipt.png) |
+
+| Case timeline | Your cases + privacy log |
+|---|---|
+| ![Timeline](shots/04-timeline.png) | ![Dashboard](shots/05-dashboard.png) |
+
+| Emergency gate (always 9-1-1 first) | Honest miss — no guessed department |
+|---|---|
+| ![Emergency](shots/06-emergency.png) | ![Unsupported](shots/07-unsupported.png) |
+
+Full captioned walkthrough: **[docs/USAGE.md](docs/USAGE.md)**.
 
 ---
 
-## Run it — no build, no server
+## How to use it
 
-```
-open index.html        # or compton-one-fix.html — same page
-```
+Takes about one minute. No account. No download.
 
-The page loads `bundle.js` (the tested, compiled TypeScript engine), `app.js`
-(controller part 1: state, strings, routing), `app.langs.js` (Tagalog + 中文
-language pack and bundle-boundary patches), `app.ui.js` (controller part 2:
-receipt, timeline, dashboard, boot) and `app.send.js` (verified submission
-channels + send block) from the same folder — **keep the six files together**.
-No server, no network calls, no account.
+### 1. Open the app
 
-Press **Run the demo scenario** for the 60-second guided path.
+Go to **[compton-one.vercel.app](https://compton-one.vercel.app)**.
+Pick **English**, **Español**, **Tagalog**, or **中文** in the header.
+
+### 2. Describe the problem
+
+Tap **Start a report**. Type what happened the way you would tell a neighbor:
+
+> “Our trash was skipped and my mother cannot move the carts herself.”
+
+Or tap a service tile on the landing page (pothole, graffiti, missed trash, streetlight, and 18 more).
+
+You do not need to know the department name.
+
+### 3. Read the Civic Action Receipt
+
+The receipt is the product. It shows:
+
+- Which city division handles this
+- The **officially verified** phone number, web form, or email — with the date it was last checked
+- What to photograph or write down before you call
+- A call script and a ready-to-send message
+- One-tap open of your own mail app (the app never presses send)
+- “Wrong number or dead link? Report it” if a contact has gone stale
+
+### 4. Take the official next step
+
+Call, open the city form, or send the email **yourself**. COMPTON ONE prepares the action. The city still receives it from you.
+
+### 5. Track the case on this phone
+
+If you want a reminder, tap **Keep this case on this phone**. Add the confirmation number the city gives you. Drop a follow-up on your calendar. Mark it resolved when it is done.
+
+Nothing is saved until you opt in. **Erase everything saved** deletes it for real.
 
 ---
 
-## Verify it
+## The 22 routes
+
+Every number and form was read from official City of Compton pages. Full source record: **[docs/SERVICE-CATALOG.md](docs/SERVICE-CATALOG.md)**.
+
+| # | What you can report | Official intake |
+|---|---|---|
+| 1 | Illegal dumping | City web form |
+| 2 | Pothole or roadway damage | Phone — no form |
+| 3 | Streetlight outage | City form or SCE form (depends on the pole) |
+| 4 | Missed trash pickup | Phone — no form |
+| 5 | Water or sewer | Phone — no form |
+| 6 | Graffiti | City web form |
+| 7 | Abandoned vehicle | Phone — no form |
+| 8 | Broken or lifted sidewalk | Phone — no form |
+| 9 | Street tree | Phone — no form |
+| 10 | Traffic signal, sign, or marking | Phone — no form |
+| 11 | Storm drain or street flooding | Phone — no form |
+| 12 | Bulky item pickup | Phone + info page |
+| 13 | Recycling and e-waste | Info page + phone |
+| 14 | Animal control | City web form |
+| 15 | Property or code violation | City web form |
+| 16 | Housing help | Department page + phone |
+| 17 | Parking citation | Pay page + appeal page |
+| 18 | Utility billing | Pay page + service page |
+| 19 | Business license / building permit | Apply pages |
+| 20 | Public records | City Clerk request pages |
+| 21 | Power outage | SCE / city report page |
+| 22 | Homeless outreach | Services page + phone |
+
+City main line if nothing matches: **(310) 605-5500**.
+Life-threatening emergency: **9-1-1**. The app stops and says so.
+
+---
+
+## How matching works (no AI)
+
+There is no language model in the routing path.
+
+1. Common typos are repaired with a fixed list (`pot hole` → pothole, `grafitti` → graffiti).
+2. The engine scores your words against keyword tables for the 22 services.
+3. If that miss, a second phrase-group pass tries again or asks an either/or question.
+4. Emergencies (“fire”, “gun”, medical danger) hit a hard gate. The only next step is 9-1-1.
+5. If nothing matches, the app says **this is outside what we handle** and gives the city main line. It will not invent a department.
+
+Chrome (buttons, labels, receipts) exists in four languages. Matching the typed description is strongest in English and Spanish. Tagalog and 中文 screens say that up front.
+
+Deep dive: **[docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md)** · **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
+
+---
+
+## Your data stays on your phone
+
+COMPTON ONE never creates an account and never talks to a city server.
+
+- No cookies, no login, no cloud database.
+- If you tap **Keep this case on this phone**, the browser writes one local key (`c1fix.cases.v1`) on that device only.
+- Session analytics are short fixed tokens in memory. Your description, address, and confirmation number cannot enter that log.
+- **Erase everything saved** runs a real delete, not an empty list.
+- Close the tab without saving and nothing is left behind.
+
+Schema and integrity rules: **[docs/DATA.md](docs/DATA.md)**.
+
+---
+
+## What is real vs. labeled as a demo
+
+**Real**
+
+- 22-route catalog and official contacts
+- Routing, receipt, scripts, evidence checklist
+- One-tap email draft into *your* mail app
+- Local save, timeline, calendar file, privacy panel
+
+**Labeled in the UI as simulated**
+
+- SMS reminders
+- A city “we got it” acknowledgment
+- Four sample cases on the dashboard
+
+**Deliberately not built**
+
+Emergency dispatch · filing the report for you · ID collection · payments · public accusations · named-offender reporting · minor profiles · predictive policing · promised response times.
+
+Permissions requested: **none.**
+
+---
+
+## Run it on your computer
+
+No build. No server. No environment variables.
 
 ```bash
-bash scripts/build-check.sh     # pre-deploy gate: files, syntax, scripts, palette
-npm install
-npx vitest run                  # unit tests (requires lib/ sources — see note below)
-npx tsc --noEmit                # strict TypeScript (requires lib/ sources)
-python3 verify.py               # browser-journey checks (requires playwright)
-python3 scripts/verify-channels.py   # wave 5: re-verify official submission channels
+git clone https://github.com/DigitalCurrensy/compton-one.git
+cd compton-one
+open index.html
 ```
 
-> **Repo note (2026-07-28):** the `lib/` TypeScript sources and the filled test
-> files were never committed — only their compiled output (`bundle.js`) is in the
-> repo. `bundle.js` is committed verbatim and loaded as-is; treat it as the
-> source of truth for the engine until `lib/` is rebuilt. `npm run build` will
-> fail without `lib/`; the HTML does not depend on it.
+Keep these files next to each other:
+
+```
+index.html          # or compton-one-fix.html — same page
+bundle.js           # routing engine
+app.js              # state, strings, routing controller
+app.langs.js        # Tagalog + 中文 pack
+app.ui.js           # receipt, timeline, dashboard
+app.send.js         # official send channels
+```
+
+That is the whole runtime. Open the HTML file. Press **Run the demo scenario**.
+
+### Checks (optional)
+
+```bash
+bash scripts/build-check.sh          # files, syntax, brand assets
+python3 scripts/verify-channels.py   # re-check official city URLs and emails
+python3 verify.py                    # browser journey (needs Playwright)
+```
+
+`npm run build` and the unit tests need a `lib/` TypeScript tree that was never committed. `bundle.js` is the engine source of truth until that tree is restored. The live page does not need it.
 
 ---
 
-## Layout
+## Project map
 
 ```
-index.html              Entry point — loads all five scripts (bundle + 4 controllers)
-compton-one-fix.html    Same page, legacy name (kept for existing links)
-app.template.html       Markup + design system (source for the HTML)
-app.js                  Controller part 1 — state, strings, routing (no build step)
-app.langs.js            Language pack — tl/zh chrome, catalog titles, bundle-boundary patches
-app.ui.js               Controller part 2 — receipt/timeline/dashboard/boot
-app.send.js             Wave 4 — verified submission channels + send block
-entry.ts                TypeScript entry point; exports C1 to window
-bundle.js               esbuild output of entry.ts + lib/ (committed, loaded as-is)
-verify.py               Browser checks (requires playwright)
-scripts/build-check.sh  Pre-deploy gate (mirrors CI)
-scripts/verify-channels.py  Wave 5 — channel drift tripwire
-tests/                  Unit tests (stubs — lib/ sources not yet committed)
-media/                  Architecture, journey, before/after, title, teaser
-shots/                  Screenshots produced by verify.py
-wave-6_Compton- one-逻辑/brand-assets/  Brand images (OG card + favicon/touch icons);
-                        copied into public/ by vercel-build — uploaded via web UI
+index.html                 Live entry page
+app.template.html          Markup + design system
+app.js / app.ui.js         Controller
+app.langs.js               TL / ZH language pack
+app.send.js                Verified submission channels
+bundle.js                  Compiled routing engine
+compton-one-demo.mp4       45-second walkthrough
+shots/                     Product screenshots
+media/                     Architecture and title frames
 docs/
-  SERVICE-CATALOG.md    22 verified city service routes (source of truth)
-  ARCHITECTURE.md       Design decisions and security model
-  SPEC.md               Original design spec (2026-07-27, historical — this README is current)
-  ROADMAP.md            Waves shipped + ranked backlog
-  HOW-IT-WORKS.md       Plain-language walkthrough of the platform
-  REPLICATE.md          Stand this up for your own city
-  HACKATHON.md          The pitch — problem, demo, differentiators
+  USAGE.md                 How to use the app, screen by screen
+  HOW-IT-WORKS.md          Plain-language product walkthrough
+  SERVICE-CATALOG.md       22 routes and official sources
+  DATA.md                  What is stored, where, and how to erase it
+  ARCHITECTURE.md          Design and security model
+  REPLICATE.md             Stand this up for another city
+  HACKATHON.md             Pitch: problem, demo, differentiators
+  SPEC.md                  Original 2026-07-27 spec (historical)
+  ROADMAP.md               Shipped work + next gaps
+CHANGELOG.md               Wave-by-wave history
+AGENTS.md                  How to change this repo
+MEMORY.md                  Decisions that must not regress
 ```
 
 ---
 
-## Controller patches — 2026-07-28 (wave 3)
+## Bring this to another city
 
-All engine code (`bundle.js`) is untouched. Changes live in `app.js`, `app.ui.js`,
-`app.langs.js` and `app.template.html`, marked with `CONTROLLER PATCH` or wave
-comments:
+The routing idea is portable. The Compton phone numbers are not.
 
-- **Four-language interface (EN/ES/TL/ZH).** Full chrome translation for Tagalog
-  and Simplified Chinese, layered over English as a fallback so an untranslated
-  string can never render as a raw key. Receipts, emergency guidance and calendar
-  files exist in EN/ES only (the city's working languages) — the language pack
-  coerces those at the bundle boundary and the UI says so honestly instead of
-  silently switching. Catalog service titles are translated; intake matching
-  stays EN/ES and the Tagalog/中文 hint text says that up front.
-- **W-01 — voice removed.** Voice input depended on the browser vendor's speech
-  service: hard-blocked on Brave, quietly proxied on Chrome, and a gimmick for
-  the residents who most needed a reliable path. It is gone entirely — button,
-  module, permission copy. Typing is the one honest input method.
-- **R-02 — routing tolerance.** A curated, deterministic rewrite table repairs
-  common typos and variants ("pot hole", "grafitti", "trafic light", "lost my
-  dog"); an order-free word-set scorer catches interpolated phrasing in the
-  scenario pass; routed results now carry `alternates`, surfaced on the receipt
-  as one-tap re-routes when confidence is not near-certain.
-- **W-02 — save confirmation feedback + dedupe.** Saving used to give zero
-  visible feedback, so residents clicked repeatedly — seven silent re-saves in
-  one session inflated the funnel and burst a bar clean out of the privacy card.
-  Now: inline confirmation / empty / already-saved messages, and repeat saves
-  of the same number are acknowledged but not re-tracked.
-- **W-03 — privacy panel redesign.** Raw analytics tokens ("confirmation_saved
-  service_id=...") read as leaked backend scripts. The panel now shows friendly
-  translated event names, service titles instead of IDs, consecutive repeats
-  collapsed to ×n, funnel bars as percentages of the true maximum (they can
-  never overflow the card), and the raw token stream behind a collapsible
-  "technical log" for auditors.
-- **W-04 — receipts that act.** One-tap email draft (opens the resident's own
-  mail app with the message written; the app still never sends anything),
-  one-tap copy of the call script, and the existing print/calendar actions.
-- **W-05 — catalog trust layer.** Every receipt shows the verification date per
-  contact method and a prefilled "wrong number or dead link? Report it" issue
-  link; the footer carries the same channel. Stale contact data is a when, not
-  an if — the repair path is now built in.
-- **W-06 — contrast + mobile.** The active journey step rendered ink-on-night
-  (invisible); fixed. Media queries at 560px/380px: full-width actions, denser
-  tiles, two-column stats, language pills sized for small screens. Stale
-  "22 services" copy is now derived from the live catalog everywhere.
-- **R-03 — dynamic counts.** Landing "how it works" and the unsupported wall
-  derive the service count from `C1.SERVICE_IDS.length` — copy cannot go stale
-  when the catalog changes.
+Fork the repo, replace the catalog with 15–25 services from *that* city’s official pages, and keep the rules: no invented channels, no AI classifier, no “we submitted it for you.”
 
-Waves 1–2 (same day, earlier): R-01 scenario engine · V-01/V-02/V-03 voice
-honesty (superseded by W-01 removal) · C-01 debris guard · P-01/P-02/P-03
-pathway · M-01 Message Studio · C-02 Google Calendar · J-01 outcome-named
-journey · D-01/D-02 palette · B-01 dead-button feedback · print blank-page fix.
+Step-by-step: **[docs/REPLICATE.md](docs/REPLICATE.md)**.
 
 ---
 
-## Wave 4 — closing the loop: verified submission channels (2026-07-29)
+## Status and next gaps
 
-Every route now carries a **verified official submission channel**, researched
-from official sources only (comptoncity.org, republicservices.com,
-pticket.com/compton, sce.com — accessed 2026-07-29), and every receipt gains a
-**"Send your report"** block that uses it:
+Shipped: four-language chrome, 22-route catalog, Civic Action Receipt, official send channels, channel-drift checker, local case tracking, privacy panel.
 
-- **7 official online forms** (comptoncity.org → I Want To → Report): illegal
-  dumping, graffiti, code violations, animal control, street-light outage
-  (city-owned), power outage, plus parking citations (pticket.com/compton).
-  The receipt deep-links the form and tells the resident to paste the Message
-  Studio text in.
-- **13 official published email addresses** (Public Works `contactpw@`,
-  Waste `contacttrash@`, Water `cwdcd@`, Housing `contactlh@`, City Clerk
-  `contactcityclerk@` — corrected from `contactcc@` in wave 5, see below —
-  Business License `contactbl@`; all @comptoncity.org). The
-  receipt's one-tap email draft now carries the verified To address and the
-  exact message the resident sees.
-- **1 honest phone-only route** (abandoned vehicles): no official written
-  channel could be verified, so the receipt says that instead of inventing one.
-- The official **City of Compton app** (comptoncity.org/services/compton-app)
-  is referenced as a secondary channel for street maintenance.
+Still open:
 
-Implementation: a self-contained module, `app.send.js` (5th script), that wraps
-`X.renderReceipt` and `window.emailDraft` from the outside — zero edits to
-`bundle.js`, `app.js`, `app.langs.js`, `app.ui.js`. The channel map is exposed
-as `C1X.SUBMISSION_CHANNELS`. Doctrine holds: **the app never sends anything
-itself** — the resident always presses send, and the block says so in all four
-languages. `verify.py` now runs 37 checks (32 wave-3 + 5 wave-4), all PASS.
+- Tagalog / 中文 **intake matching** (chrome is translated; typed matching is still strongest in EN/ES)
+- Offline / PWA shell
+- Real SMS reminders (today they are labeled simulated)
+
+History: **[CHANGELOG.md](CHANGELOG.md)** · **[docs/ROADMAP.md](docs/ROADMAP.md)**.
 
 ---
 
-## Wave 5 — catalog trust pipeline (2026-07-29)
+## License
 
-The verified catalog is an asset and a liability: one stale channel quietly
-breaks trust with exactly the resident who needed it most. This wave converts
-the quarterly manual catalog review into an always-on tripwire.
+MIT © Digital Currensy Inc.
 
-- **`scripts/verify-channels.py`** — re-fetches every channel's official
-  source (form URLs directly; the official city pages that publish each email —
-  CivicPlus hides addresses behind `mailto:` "Email" links, so raw markup is
-  searched, not rendered text). A real page that lost the address = drift
-  (exit 1 + Markdown report); a bot-wall challenge page = inconclusive and
-  retried, never auto-failed. `--update-date` bumps the in-app verification
-  date after a fully clean pass.
-- **Per-channel `src` registry** on `C1X.SUBMISSION_CHANNELS` — every channel
-  declares the official page(s) that publish it; the checker parses the map
-  straight out of `app.send.js` (single source of truth, no drift between
-  data and checker).
-- **Honest aging on the receipt** — `X.SUBMISSION_VERIFIED` is exposed; past
-  45 days the send block warns that re-verification is due instead of silently
-  showing an old "verified" stamp.
-- **First catch, applied same-day** — the official City Clerk page no longer
-  publishes `contactcc@`; it now shows `contactcityclerk@comptoncity.org`.
-  The `public_records` channel is corrected in this wave. This is the pipeline
-  working as designed.
-- **Weekly CI** (`.github/workflows/channel-verify.yml`, added via web UI —
-  the bot token lacks the `workflow` scope) runs the checker on a schedule and
-  opens a GitHub issue with the report when a channel drifts.
-
-`verify.py` now runs **40 checks** (37 + 3 wave-5), all PASS.
-
----
-
-## Wave 6 — brand: social sharing, favicon, mobile icons (2026-07-29)
-
-The link is the demo — most people will meet this project as a pasted URL.
-Wave 6 makes that first impression carry the brand:
-
-- **Open Graph + Twitter card meta** on both entry points (and the template):
-  `og.jpg` (1200×630), absolute `compton-one.vercel.app` URLs,
-  `summary_large_image`, meta description, `theme-color` matching `--night`.
-- **Icons** derived from the project logo: `favicon-32.png`,
-  `apple-touch-icon.png` (iOS home screen), `icon-192.png` (Android/PWA).
-- **Deploy wiring** — `vercel-build` copies the four images into `public/`;
-  `scripts/build-check.sh` gained a brand gate (step 7) that fails the build
-  if the OG wiring or assets go missing.
-- The OG description states the honest scope: the app routes residents to the
-  verified official channel — it never submits to the city.
-
-`verify.py` now runs **41 checks** (40 + 1 brand), all PASS.
-
----
-
-## The 22 catalogued routes
-
-All 22 routes are sourced, verified, and documented in
-[`docs/SERVICE-CATALOG.md`](docs/SERVICE-CATALOG.md) — and all 22 are reachable
-today: through the tested engine's keyword tables, backed by the R-01 scenario
-engine, with an honest unsupported wall (and the verified main line
-`(310) 605-5500`) when nothing matches.
-
-Illegal dumping · pothole · streetlight outage · missed trash pickup · water or
-sewer · graffiti · abandoned vehicle · sidewalk · street tree · traffic
-signal/sign · storm drain & flooding · bulky item pickup · recycling & e-waste ·
-animal control · code/property violation · housing help · parking citation ·
-utility billing · business licence/permit · public records · power outage ·
-homeless outreach.
-
----
-
-## Architecture in one paragraph
-
-There is **no model in the routing path.** Classification is deterministic keyword
-and phrase scoring with word-boundary matching in English and Spanish, in two
-passes (tested engine, then controller scenario net), fronted by a curated typo
-table. All paths can only emit known service IDs; a type guard and
-`getRouteOrThrow` reject anything else. The emergency gate cannot be argued out
-of firing. This is why prompt injection cannot produce a fabricated department.
-
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full design rationale.
-
----
-
-## Rebuild after editing `app.template.html`
-
-The HTML is assembled by replacing five placeholders:
-
-```bash
-python3 - <<'EOF'
-import pathlib
-t = pathlib.Path('app.template.html').read_text()
-out = (t.replace('<script>\n/*__BUNDLE__*/\n</script>', '<script src="bundle.js"></script>')
-        .replace('<script>\n/*__APP__*/\n</script>', '<script src="app.js"></script>')
-        .replace('<script>\n/*__APPLANGS__*/\n</script>', '<script src="app.langs.js"></script>')
-        .replace('<script>\n/*__APPUI__*/\n</script>', '<script src="app.ui.js"></script>')
-        .replace('<script>\n/*__APPSEND__*/\n</script>', '<script src="app.send.js"></script>'))
-pathlib.Path('compton-one-fix.html').write_text(out)
-pathlib.Path('index.html').write_text(out)
-EOF
-```
-
-(`npm run build` still documents the original inline-bundle pipeline; it requires
-the uncommitted `lib/` sources and is not needed for deployment.)
-
----
-
-## What is simulated, and labelled as such
-
-SMS reminders · city acknowledgment · four dashboard demo cases.
-
-## What is deliberately not built
-
-Emergency dispatch · direct city submission · ID collection · payments ·
-public accusations · named-offender reporting · minor profiles · predictive
-policing · guaranteed response times.
-
-## Permissions this app requests
-
-**None.** No microphone, camera, location, contacts, or network calls of its
-own. (Voice input was removed in wave 3 — typing is the single, identical path
-on every browser.)
-
-The only writable surface is `localStorage`, and only after explicit resident
-opt-in on the receipt screen — one key, on that device, never sent anywhere,
-erased completely by a single control.
+COMPTON ONE : FIX is an independent prototype. It is not operated by the City of Compton and does not submit reports on your behalf.
